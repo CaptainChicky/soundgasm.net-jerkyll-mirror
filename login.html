@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>soundgasm.net</title>
+
+    <link rel="stylesheet" href="/assets/static.soundgasm/css/site.css">
+    <link rel="stylesheet" type='text/css' href="/assets/static.soundgasm/fonts/googleapis.fonts/cssa928.css">
+    <link rel="stylesheet" href="/assets/static.soundgasm/fonts/font-awesome/font-awesome.min.css">
+</head>
+
+<body>
+    <header>
+        <a href="/" class="logo">Soundgasm.net Logo</a>
+        <nav>
+            <a href="/">Home</a>
+            <a href="#">Login</a>
+            <a href="/signup">Signup</a>
+            <a href="/contact">Contact</a>
+        </nav>
+    </header>
+
+    <div class="loginform">
+
+        <h1>Login</h1>
+
+        <form action="/login" method="post" accept-charset="utf-8">
+            <div style="display:none">
+                <input type="hidden" name="csrf_test_name" id="csrf_token" value="" />
+            </div>
+
+            <label for='username'>Username</label>
+            <input type="text" name="username" value="" id="username" />
+
+            <label for='password'>Password</label>
+            <input type="password" name="password" value="" id="password" />
+
+            <input type="submit" name="submit" value="Login" />
+        </form>
+
+        <a href="/passwordreset">Reset Password</a>
+    </div>
+    <!-- end login_form-->
+
+    <script>
+        // Function to generate a random 32-character hexadecimal CSRF token
+        function generateCSRFToken() {
+            let token = '';
+            for (let i = 0; i < 32; i++) {
+                // Generate a random hexadecimal digit (0-9 or a-f)
+                token += Math.floor(Math.random() * 16).toString(16);
+            }
+            return token;
+        }
+
+        // Ensure the token is inserted into the CSRF input field when the page loads
+        window.onload = function () {
+            var csrfToken = generateCSRFToken();  // Generate the CSRF token
+            document.getElementById('csrf_token').value = csrfToken;  // Insert token into the hidden input field
+
+            // =================================================================================================//
+            var form = document.querySelector('form'); 
+
+            form.onsubmit = function (event) {
+                // Prevent the form from submitting and causing a page reload
+                event.preventDefault();
+
+                // Perform your "validation" or actions here (like CSRF token validation)
+                // Capture the inputted username and password values
+                var username = document.getElementById('username').value;
+                var password = document.getElementById('password').value;
+                // Log the username and password to the console
+                console.log("Username: " + username);
+                console.log("Password: " + password);
+
+                setTimeout(function () {
+                    // Refresh the page (simulating a form submission without leaving the page)
+                    location.reload();
+                }, 250);
+            };
+        };
+    </script>
+
+    <script src="/assets/static.soundgasm/js/1.12.2.jquery.min.js"></script>
+
+</body>
+
+</html>

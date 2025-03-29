@@ -1,0 +1,42 @@
+---
+# this is an empty front matter so liquid code is processed
+---
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>soundgasm.net</title>
+
+    <link rel="stylesheet" href="{{ "/assets/static.soundgasm/css/site.css" | relative_url }}">
+    <link rel="stylesheet" type='text/css' href="{{ "/assets/static.soundgasm/fonts/googleapis.fonts/cssa928.css" | relative_url }}">
+    <link rel="stylesheet" href="{{ "/assets/static.soundgasm/fonts/font-awesome/font-awesome.min.css" | relative_url }}">  
+</head>
+
+<body>
+    <header>
+        <a href="/" class="logo">Soundgasm.net Logo</a> 
+        <nav>
+            <a href="/">Home</a> 
+            <a href="/login">Login</a> 
+            <a href="/signup">Signup</a>
+            <a href="/contact">Contact</a> 
+        </nav>
+    </header>
+
+    {% for entry in page.entries %}
+    <div class="sound-details">
+        <a href="/u/{{ page.user }}/{{ entry['title'] | slugify: 'default' }}.html">{{ entry['title'] }}</a><br>
+        <span class="soundDescription">{{ entry['description'] }}</span><br>
+        <span class="playCount">Play Count: {{ entry['playcount'] }}</span>
+    </div>
+    {% endfor %}
+
+    <script src="{{ "/assets/static.soundgasm/js/1.12.2.jquery.min.js" | relative_url }}"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>soundgasm.net</title>
+
+    <link rel="stylesheet" href="/assets/static.soundgasm/css/site.css">
+    <link rel="stylesheet" type='text/css' href="/assets/static.soundgasm/fonts/googleapis.fonts/cssa928.css">
+    <link rel="stylesheet" href="/assets/static.soundgasm/fonts/font-awesome/font-awesome.min.css">
+</head>
+
+<body>
+    <header>
+        <a href="/" class="logo">Soundgasm.net Logo</a>
+        <nav>
+            <a href="/">Home</a>
+            <a href="/login">Login</a>
+            <a href="/signup">Signup</a>
+            <a href="#">Contact</a>
+        </nav>
+    </header>
+
+    <div id="tobereplaced">
+    <ul>
+        <li>This page is for leaving feedback to the soundgasm.net administrator.</li>
+    </ul>
+
+    <div class="contactform">
+        <form action="/contact" method="post" accept-charset="utf-8">
+            <div style="display:none">
+                <input type="hidden" name="csrf_test_name" id="csrf_token" value="" />
+            </div>
+            
+            <label for="email">Email</label>
+            <input type="text" name="email" value="" id="email" />
+            
+            <label for="comment">Comment</label>
+            <textarea name="comment" cols="40" rows="10" id="comment"></textarea>
+            
+            <input type="submit" name="submit" value="Submit Feedback" />
+        </form>
+    </div>
+    </div>
+
+    <script>
+        // Function to generate a random 32-character hexadecimal CSRF token
+        function generateCSRFToken() {
+            let token = '';
+            for (let i = 0; i < 32; i++) {
+                // Generate a random hexadecimal digit (0-9 or a-f)
+                token += Math.floor(Math.random() * 16).toString(16);
+            }
+            return token;
+        }
+
+        // Ensure the token is inserted into the CSRF input field when the page loads
+        window.onload = function () {
+            var csrfToken = generateCSRFToken();  // Generate the CSRF token
+            document.getElementById('csrf_token').value = csrfToken;  // Insert token into the hidden input field
+
+            // =================================================================================================//
+            var form = document.querySelector('form');
+
+            form.onsubmit = function (event) {
+                // Prevent the form from submitting and causing a page reload
+                event.preventDefault();
+
+                // Perform your "validation" or actions here (like CSRF token validation)
+                // Get the values of the email and comment input fields by their IDs
+                var email = document.getElementById('email').value;
+                var comment = document.getElementById('comment').value;
+
+                // Log the values to the console
+                console.log("Email: " + email);
+                console.log("Comment: " + comment);
+
+                setTimeout(function () {
+                    // Replace the content of the div with ID 'tobereplaced' with the string 'SUCCESS!'
+                    document.getElementById('tobereplaced').innerHTML = 'SUCCESS!';
+                }, 100);
+            };
+        };
+    </script>
+
+    <script src="/assets/static.soundgasm/js/1.12.2.jquery.min.js"></script>
+
+</body>
+
+</html>

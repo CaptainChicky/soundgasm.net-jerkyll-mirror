@@ -1,0 +1,101 @@
+---
+# this is an empty front matter so liquid code is processed
+---
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- favicon only for main index, do NOT include anywhere else -->
+    <link rel="icon" href="/assets/yumshot.ico" sizes="any">
+
+    <title>soundgasm.net</title>
+
+    <link rel="stylesheet" href="/assets/static.soundgasm/css/site.css">
+    <link rel="stylesheet" type='text/css' href="/assets/static.soundgasm/fonts/googleapis.fonts/cssa928.css">
+    <link rel="stylesheet" href="/assets/static.soundgasm/fonts/font-awesome/font-awesome.min.css">
+</head>
+
+<body>
+    <header>
+        <a href="/" class="logo">Soundgasm.net Logo</a>
+        <nav>
+            <a href="#">Home</a>
+            <a href="/login">Login</a>
+            <a href="/signup">Signup</a>
+            <a href="/contact">Contact</a>
+        </nav>
+    </header>
+
+
+    <div id="container">
+        <h1>Welcome to soundgasm.net BETA!</h1>
+
+        <div id="body">
+            <p>The future home for your audio hosting needs.</p>
+
+            <h4 style="margin-bottom: 0%;">List of Archives:</h4>
+            <ul style="margin-top: 5px;">
+                <!-- user is a key in the users dictionary, 0 is the name, and 1 is the values  -->
+                {% for user in site.data.audio_data.users %}
+                <li style="padding-top: 0.25em;"><a href="/u/{{ user[0] }}/">{{ user[0] }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <p class="footer">Page rendered in <strong id="render-time"></strong> seconds</p>
+        
+        <!-- weighted calculation of render time -->
+        <script>
+            // Function to generate random number with weighted distribution
+            function generateWeightedRandomTime() {
+                // Define the values and their associated weights (in percentage)
+                const values = [
+                    { value: 0.0020, weight: 5 },
+                    { value: 0.0006, weight: 40 },
+                    { value: 0.0005, weight: 5 }
+                ];
+
+                // Add the range between 0.0020 and 0.0006 (excluding the exact values)
+                const rangeStart = 0.0020;
+                const rangeEnd = 0.0006;
+                const rangeWeight = 50;  // 50% chance will be assigned to the range between 0.0020 and 0.0006
+
+                // Create an array to hold the weighted values (by repeating based on weight)
+                let weightedValues = [];
+
+                // Add the fixed values to the weighted array
+                values.forEach(item => {
+                    const repeatCount = item.weight; // Integer number of times to repeat based on weight
+                    for (let i = 0; i < repeatCount; i++) {
+                        weightedValues.push(item.value);
+                    }
+                });
+
+                // Add the values between the range (with the smaller numbers having higher frequency)
+                for (let i = 0; i < rangeWeight; i++) {
+                    // Generating random values between rangeStart (0.0020) and rangeEnd (0.0006)
+                    const rand = Math.random();
+                    const weightedValue = Math.pow(rand, 3) * (rangeStart - rangeEnd) + rangeEnd; // Cubic to bias toward smaller values
+                    weightedValues.push(weightedValue);
+                }
+
+                // Now select a random value from the weighted values array
+                const randomIndex = Math.floor(Math.random() * weightedValues.length);
+                return weightedValues[randomIndex].toFixed(4); // Return the random value formatted to 4 decimal places
+            }
+
+            // Set the random time in the footer
+            document.getElementById("render-time").textContent = generateWeightedRandomTime();
+        </script>
+
+    </div>
+
+    <script src="/assets/static.soundgasm/js/1.12.2.jquery.min.js"></script>
+
+</body>
+
+</html>

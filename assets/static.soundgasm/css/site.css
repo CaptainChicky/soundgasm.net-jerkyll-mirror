@@ -1,0 +1,253 @@
+/* 
+    Document   : site
+    Created on : Jun 27, 2013, 6:38:01 PM
+    Author     : admin
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+root
+{ 
+    display: block;
+}
+
+::selection{ background-color: #E13300; color: white; }
+::moz-selection{ background-color: #E13300; color: white; }
+::webkit-selection{ background-color: #E13300; color: white; }
+
+body
+{
+    background-color: #eee;
+    margin: 40px;
+    /*font: 13px/20px normal Helvetica, Arial, sans-serif;*/
+    font-family: Ubuntu, sans-serif;
+    color: #4F5155;
+}
+
+h1
+{
+    color: #444;
+    background-color: transparent;
+    border-bottom: 1px solid #D0D0D0;
+    font-size: 19px;
+    font-weight: normal;
+    margin: 0 0 14px 0;
+    padding: 14px 15px 10px 15px;
+}
+
+code
+{
+    font-family: Consolas, Monaco, Courier New, Courier, monospace;
+    font-size: 12px;
+    background-color: #f9f9f9;
+    border: 1px solid #D0D0D0;
+    color: #002166;
+    display: block;
+    margin: 14px 0 14px 0;
+    padding: 12px 10px 12px 10px;
+}
+
+#body
+{
+    margin: 0 15px 0 15px;
+}
+
+p.footer
+{
+    text-align: right;
+    font-size: 11px;
+    border-top: 1px solid #D0D0D0;
+    line-height: 32px;
+    padding: 0 10px 0 10px;
+    margin: 20px 0 0 0;
+}
+
+#container
+{
+    margin: 10px;
+    border: 1px solid #D0D0D0;
+    -webkit-box-shadow: 0 0 8px #D0D0D0;
+}
+
+label
+{
+    padding:4px 0;
+    display:block;
+    font-weight:bold;
+    text-align:left;
+    width:100%;
+}
+
+input,textarea
+{
+    font-size:12px;
+    padding:4px 0;
+    border:solid 1px #aacfe4;
+    width:100%;
+    margin:2px 0 20px 0;
+}
+
+.signupform
+{
+    margin:0 auto;
+    width:400px;
+    padding:14px;
+}
+
+.signupform #submit
+{
+    clear:both;
+    /*margin-left:150px;*/
+    margin:0 auto;
+    width:100%;
+    height:31px;
+    /*background:#666666 url(img/button.png) no-repeat;*/
+    text-align:center;
+    /*line-height:31px;*/
+    /*color:#FFFFFF;
+    font-size:11px;
+    font-weight:bold;*/
+}
+
+.uploadform, .contactform, .loginform, .signupform, .passwordresetform
+{
+    margin:0 auto 0 0;
+    width:400px;
+    padding:14px;
+    border:solid 1px #aacfe4;
+    border-radius:5px;
+    margin:10px;
+}
+
+.loginform
+{
+    width: 250px;
+}
+
+nav > a
+{
+    /*display:inline-block;
+    *display:inline;
+    zoom:1;*/
+    /*width:80px;*/
+    color: #003399;
+    background-color: transparent;
+    font-weight: 500;
+    font-family: Ubuntu, sans-serif;
+    font-size: 16px;
+    text-align:center;
+    text-decoration: none;
+    padding: 5px 20px;
+}
+
+nav {
+  font-size: 0;
+  /* This removes the space between inline elements */
+}
+
+.site-nav
+{
+    background:#eee;
+    margin: 10px 0;
+}
+
+.sound-details
+{
+    border:solid 1px #aacfe4;
+    padding: 10px;
+    border-radius:15px;
+    margin: 5px 0;
+}
+
+div.sound-management
+{
+    overflow: hidden;
+}
+
+div.sound-management a
+{
+    float: left;
+    margin: 0 5px;
+}
+
+div.sound-management span.deleteSound
+{
+    background-color: red;
+    color: white;
+    font-weight: bold;
+    font-size: 1.1em;
+    float: left;
+    margin: 0 5px;
+    cursor: pointer;
+    padding: 5px;
+    
+}
+
+.playCount
+{
+    font-size: 12px;
+}
+
+header
+{
+    min-height: 90px;
+}
+
+.logo
+{
+    height:90px;
+    display:inline-block;
+    text-decoration: none;
+    color: #003399;
+}
+
+.sound-management>a
+{
+    text-decoration: none;
+    width: 161px;
+    height: 34px;
+    text-align: center;
+    font-size: 30px;
+}
+.sound-management>a.private
+{
+    color: red;
+}
+
+.sound-management>a.public
+{
+    color: green;
+}
+
+.info, .success, .warning, .error, .validation {
+margin: 10px 0px;
+padding:12px;
+border-radius:.5em;
+border: 1px solid;
+font-size: 12px;
+}
+.info {
+    color: #00529B;
+    background-color: #BDE5F8;
+}
+.success {
+    color: #4F8A10;
+    background-color: #DFF2BF;
+}
+.warning {
+    color: #9F6000;
+    background-color: #FEEFB3;
+}
+.error {
+    color: #D8000C;
+    background-color: #FFBABA;
+}
+.validation {
+    color: #D63301;
+    background-color: #FFCCBA;
+}
+.info i, .success i, .warning i, .error i, .validation i {
+    margin:5px 5px;
+    font-size:2em;
+    vertical-align:middle;
+}

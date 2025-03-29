@@ -73,7 +73,7 @@
             $("#jquery_jplayer_1").jPlayer({
                 ready: function () {
                     $(this).jPlayer("setMedia", {
-                        m4a: "../../media/{{ page.user }}/{{ page.audio }}"
+                        m4a: "../../media/{{ page.user }}/{{ page.audio }}" // media folder is contained at root
                     });
                 },
                 supplied: "m4a",

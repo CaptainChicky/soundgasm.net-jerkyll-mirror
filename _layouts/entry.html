@@ -1,3 +1,7 @@
+---
+# this is an empty front matter so liquid code is processed
+---
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,17 +19,17 @@
 
 <body>
     <header>
-        <a href="/" class="logo">Soundgasm.net Logo</a>
+        <a href="{{ site.baseurl }}/" class="logo">Soundgasm.net Logo</a>
         <nav>
-            <a href="/">Home</a>
-            <a href="/login">Login</a>
-            <a href="/signup">Signup</a>
-            <a href="/contact">Contact</a>
+            <a href="{{ site.baseurl }}/">Home</a>
+            <a href="{{ site.baseurl }}/login">Login</a>
+            <a href="{{ site.baseurl }}/signup">Signup</a>
+            <a href="{{ site.baseurl }}/contact">Contact</a>
         </nav>
     </header>
 
     <div style="margin:10px 0">
-        <a href="/u/{{ page.user }}">{{ page.user }}</a>
+        <a href="{{ site.baseurl }}/u/{{ page.user }}">{{ page.user }}</a>
     </div>
 
     <div id="jquery_jplayer_1" class="jp-jplayer"></div>
@@ -73,7 +77,7 @@
             $("#jquery_jplayer_1").jPlayer({
                 ready: function () {
                     $(this).jPlayer("setMedia", {
-                        m4a: "../../media/{{ page.user }}/{{ page.audio }}" // media folder is contained at root
+                        m4a: "{{ site.baseurl }}/media/{{ page.user }}/{{ page.audio }}" // media folder is contained at root
                     });
                 },
                 supplied: "m4a",

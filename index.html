@@ -10,23 +10,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <!-- favicon only for main index, do NOT include anywhere else -->
-    <link rel="icon" href="/assets/yumshot.ico" sizes="any">
+    <link rel="icon" href="{{ site.baseurl }}/assets/yumshot.ico" sizes="any">
 
     <title>soundgasm.net</title>
 
-    <link rel="stylesheet" href="/assets/static.soundgasm/css/site.css">
-    <link rel="stylesheet" type='text/css' href="/assets/static.soundgasm/fonts/googleapis.fonts/cssa928.css">
-    <link rel="stylesheet" href="/assets/static.soundgasm/fonts/font-awesome/font-awesome.min.css">
+    <link rel="stylesheet" href="{{ site.baseurl }}/assets/static.soundgasm/css/site.css">
+    <link rel="stylesheet" type='text/css' href="{{ site.baseurl }}/assets/static.soundgasm/fonts/googleapis.fonts/cssa928.css">
+    <link rel="stylesheet" href="{{ site.baseurl }}/assets/static.soundgasm/fonts/font-awesome/font-awesome.min.css">
 </head>
 
 <body>
     <header>
-        <a href="/" class="logo">Soundgasm.net Logo</a>
+        <a href="{{ site.baseurl }}/" class="logo">Soundgasm.net Logo</a>
         <nav>
             <a href="#">Home</a>
-            <a href="/login">Login</a>
-            <a href="/signup">Signup</a>
-            <a href="/contact">Contact</a>
+            <a href="{{ site.baseurl }}/login">Login</a>
+            <a href="{{ site.baseurl }}/signup">Signup</a>
+            <a href="{{ site.baseurl }}/contact">Contact</a>
         </nav>
     </header>
 
@@ -41,7 +41,7 @@
             <ul style="margin-top: 5px;">
                 <!-- user is a key in the users dictionary, 0 is the name, and 1 is the values  -->
                 {% for user in site.data.audio_data.users %}
-                <li style="padding-top: 0.25em;"><a href="/u/{{ user[0] }}/">{{ user[0] }}</a></li>
+                <li style="padding-top: 0.25em;"><a href="{{ site.baseurl }}/u/{{ user[0] }}/">{{ user[0] }}</a></li>
                 {% endfor %}
             </ul>
         </div>
@@ -94,7 +94,7 @@
 
     </div>
 
-    <script src="/assets/static.soundgasm/js/1.12.2.jquery.min.js"></script>
+    <script src="{{ site.baseurl }}/assets/static.soundgasm/js/1.12.2.jquery.min.js"></script>
 
 </body>
 

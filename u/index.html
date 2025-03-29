@@ -1,11 +1,15 @@
+---
+# this is an empty front matter so liquid code is processed
+---
+
 <html>
 
 <head>
-    <meta http-equiv="refresh" content="0;url=/404">
+    <meta http-equiv="refresh" content="0;url={{ site.baseurl }}/404">
     <script type="text/javascript">
         // JavaScript fallback in case meta-refresh fails
         setTimeout(function () {
-            window.location.href = "/404";
+            window.location.href = "{{ site.baseurl }}/404";
         }, 10); 
     </script>
 </head>

@@ -18,18 +18,18 @@
 
 <body>
     <header>
-        <a href="/" class="logo">Soundgasm.net Logo</a> 
+        <a href="{{ site.baseurl }}/" class="logo">Soundgasm.net Logo</a> 
         <nav>
-            <a href="/">Home</a> 
-            <a href="/login">Login</a> 
-            <a href="/signup">Signup</a>
-            <a href="/contact">Contact</a> 
+            <a href="{{ site.baseurl }}/">Home</a> 
+            <a href="{{ site.baseurl }}/login">Login</a> 
+            <a href="{{ site.baseurl }}/signup">Signup</a>
+            <a href="{{ site.baseurl }}/contact">Contact</a> 
         </nav>
     </header>
 
     {% for entry in page.entries %}
     <div class="sound-details">
-        <a href="/u/{{ page.user }}/{{ entry['title'] | slugify: 'default' }}.html">{{ entry['title'] }}</a><br>
+        <a href="{{ site.baseurl }}/u/{{ page.user }}/{{ entry['title'] | slugify: 'default' }}.html">{{ entry['title'] }}</a><br>
         <span class="soundDescription">{{ entry['description'] }}</span><br>
         <span class="playCount">Play Count: {{ entry['playcount'] }}</span>
     </div>

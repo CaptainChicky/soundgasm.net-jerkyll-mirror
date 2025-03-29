@@ -1,11 +1,15 @@
+---
+# this is an empty front matter so liquid code is processed
+---
+
 <html>
 
 <head>
-    <meta http-equiv="refresh" content="0;url=/passwordreset/step1/">
+    <meta http-equiv="refresh" content="0;url={{ site.baseurl }}/passwordreset/step1/">
     <script type="text/javascript">
         // JavaScript fallback in case meta-refresh fails
         setTimeout(function () {
-            window.location.href = "/passwordreset/step1/";
+            window.location.href = "{{ site.baseurl }}/passwordreset/step1/";
         }, 10); 
     </script>
 </head>

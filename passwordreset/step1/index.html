@@ -1,3 +1,7 @@
+---
+# this is an empty front matter so liquid code is processed
+---
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -7,19 +11,19 @@
 
     <title>soundgasm.net</title>
 
-    <link rel="stylesheet" href="/assets/static.soundgasm/css/site.css">
-    <link rel="stylesheet" type='text/css' href="/assets/static.soundgasm/fonts/googleapis.fonts/cssa928.css">
-    <link rel="stylesheet" href="/assets/static.soundgasm/fonts/font-awesome/font-awesome.min.css">
+    <link rel="stylesheet" href="{{ site.baseurl }}/assets/static.soundgasm/css/site.css">
+    <link rel="stylesheet" type='text/css' href="{{ site.baseurl }}/assets/static.soundgasm/fonts/googleapis.fonts/cssa928.css">
+    <link rel="stylesheet" href="{{ site.baseurl }}/assets/static.soundgasm/fonts/font-awesome/font-awesome.min.css">
 </head>
 
 <body>
     <header>
-        <a href="/" class="logo">Soundgasm.net Logo</a>
+        <a href="{{ site.baseurl }}/" class="logo">Soundgasm.net Logo</a>
         <nav>
-            <a href="/">Home</a>
-            <a href="/login">Login</a>
-            <a href="/signup">Signup</a>
-            <a href="/contact">Contact</a>
+            <a href="{{ site.baseurl }}/">Home</a>
+            <a href="{{ site.baseurl }}/login">Login</a>
+            <a href="{{ site.baseurl }}/signup">Signup</a>
+            <a href="{{ site.baseurl }}/contact">Contact</a>
         </nav>
     </header>
 
@@ -27,7 +31,7 @@
 
         <h1>Password Reset Step 1</h1>
 
-        <form action="/passwordreset/step1" method="post" accept-charset="utf-8">
+        <form action="{{ site.baseurl }}/passwordreset/step1" method="post" accept-charset="utf-8">
             <div style="display:none">
                 <input type="hidden" name="csrf_test_name" id="csrf_token" value="" />
             </div>
@@ -76,13 +80,13 @@
 
                 setTimeout(function () {
                     // Redirect from /passwordreset/step1/ to /passwordreset/step2/
-                    window.location.href = "/passwordreset/step2/";
+                    window.location.href = "{{ site.baseurl }}/passwordreset/step2/";
                 }, 250);
             };
         };
     </script>
 
-    <script src="/assets/static.soundgasm/js/1.12.2.jquery.min.js"></script>
+    <script src="{{ site.baseurl }}/assets/static.soundgasm/js/1.12.2.jquery.min.js"></script>
 
 </body>
 

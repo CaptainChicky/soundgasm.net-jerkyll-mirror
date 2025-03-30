@@ -6,11 +6,11 @@ You can look over all the html files in the root and `/u/`, `/passwordreset/`, a
 
 `/assets/` contains all the website css/images/js whatever, ideally don't change that.
 
-`/media/` contains your actual audio files, which I've changed from what the actual site does (a database of `some-hash.m4a`) to `/username/some-hash.m4a` to be more organized. Yes, there are audios in there already from me testing this lmao 👀
+```/media/``` contains your actual audio files, which I've changed from what the actual site does (a database of ```some-hash.m4a```) to ```/username/some-hash.m4a``` to be more organized. Yes, there are audios in there already from me testing this lmao 👀<sup>☣☣</sup>
 
-`/_layouts/` contains the user profile layout, as well as the audio entry layouts. In these templates, note that `{{ "[link]" | relative_url }}` does the same thing as using `{{ site.baseurl }}`.
+```/_layouts/``` contains the user profile layout, as well as the audio entry layouts. In these templates, note that ```{{ "[link]" | relative_url }}``` does the same thing as using ```{{ site.baseurl }}```.
 
-`/_data/` contains a `audio_data.yml` file (which already has entries corresponding to the stuff I was testing in `/media/`) which lists out all the actually important data in organization of
+```/_data/``` contains a `audio_data.yml` file (which already has entries corresponding to the stuff I was testing in `/media/`) which lists out all the actually important data in organization of
 ```yaml
 users:
   [username]:
@@ -19,7 +19,7 @@ users:
       playcount: [playcount]
       audio: [audio]
 ```
-which is used to dynamically generate user and audio pages by the two ruby scripts in `/_plugins/`. I've commentated the audio page one, and the user one is similar so shouldn't be that hard to understand (plus its like half GPT generated lol). There's a `audio_data.yml.bak` backup file because I was trying to mass-add stuff with python scripts (which I was too lazy to remove since they might come in handy later).
+which is used to dynamically generate user and audio pages by the two ruby scripts in ```/_plugins/```. I've commentated the audio page one, and the user one is similar so shouldn't be that hard to understand (plus its like half GPT generated lol). There's a `audio_data.yml.bak` backup file because I was trying to mass-add stuff with python scripts (which I was too lazy to remove since they might come in handy later).
 
 If an audio's name or description is annoying (i.e. has characters that don't escape well or is too long), you can simply do as follows:
 ```yaml

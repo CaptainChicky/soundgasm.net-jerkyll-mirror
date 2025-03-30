@@ -4,6 +4,7 @@ This is a badly copied over soundgasm.net mirror, with simulation of loading tim
 
 You can look over all the html files in the root and `/u/`, `/passwordreset/`, as they are all just custom coded templates that I copied over and modified. In particular, `index.html` on the root is changed to display all users.
 
-`/assets/` contains all the website css, images, js whatever, ideally don't change that.
-
-`/media/` contains your actual audio files, which I've changed from what t
+`/assets/` contains all the website css, images, js whatever, ideally don't change that. what
+what
+what
+what

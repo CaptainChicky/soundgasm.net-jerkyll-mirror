@@ -6,9 +6,9 @@ You can look over all the html files in the root and `/u/`, `/passwordreset/`, a
 
 `/assets/` contains all the website css/images/js whatever, ideally don't change that. 
 
-what
+what why is this line not displayed on the github readme render
 
-what
+what why is this line not displayed on the github readme render
 
 `/media/` contains your actual audio files, which I've changed from what the actual site does (a database of `some-hash.m4a`) to `/username/some-hash.m4a` to be more organized. Yes, there are audios in there already from me testing this lmao 👀<sup>☣☣</sup>
 

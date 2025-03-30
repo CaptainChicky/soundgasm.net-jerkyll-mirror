@@ -76,6 +76,6 @@ If you want to host on a domain do your own shennaingans set up CNAME/server wha
 Have fun ig :3
 
 ### <sup>☣☣</sup>Note
-I'm quite literally going to use this as my own archive btw so this repo might get bloated from `/media/` :3
+Note I'm quite literally going to use this as my own archive btw so this repo might get bloated from `/media/` :3
 
 ![imagine not loading the image](https://private-user-images.githubusercontent.com/70708832/428362692-e006518f-f2eb-40c1-a2bf-2b5fd5fcc6c5.gif?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NDMyOTUzODIsIm5iZiI6MTc0MzI5NTA4MiwicGF0aCI6Ii83MDcwODgzMi80MjgzNjI2OTItZTAwNjUxOGYtZjJlYi00MGMxLWEyYmYtMmI1ZmQ1ZmNjNmM1LmdpZj9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNTAzMzAlMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjUwMzMwVDAwMzgwMlomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPTZkOTAxNDc4M2Q4ZDFhNzJkODU5MWQ2OWY5NGE4ZGM2ZDgzNjJiNWZlOWVlMTcxMmUzNmE5MzI4M2Q1MjFiZDAmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0In0.rnQ08EiCEPzXTcYiKxh3nl_A7FlLSQpUgprFLp5Ae3c)

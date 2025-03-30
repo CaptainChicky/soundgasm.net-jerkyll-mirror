@@ -57,4 +57,4 @@ baseurl: '/soundgasm.net-jerkyll-mirror' # the subpath of your site, e.g. /blog
 collections:
   audio_entries:
     output: true
-    permalink: /u/:path/:title.html
+    permalink: "{{ site.baseurl }}/u/:path/:title.html"

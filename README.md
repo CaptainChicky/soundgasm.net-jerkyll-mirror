@@ -37,7 +37,7 @@ users:
       audio: [audio]
 ```
 
-When you want to add an audio to the archive, simply update `audio_data.yml` with the neccesary data (and backup beforehand when using scripts as desired), and add the audio file to `/media/[user]/`. Audio titles should be unique, and if they aren't, simply add something to make it unique (e.g. `audio title` vs `audio title-`).
+When you want to add an audio to the archive, simply update `audio_data.yml` with the neccesary data (and backup beforehand when using scripts as desired), and add the audio file to `/media/[user]/`. Audio titles should be unique, and if they aren't, simply add something to make it unique (e.g. `audio title` vs `audio titlee`).
 
 When audios are privated, you are unable to access the `playcount`, so I just put some random unicode character or whatever as a replacement in `audio_data.yml`. Some examples are below:
 1. ﷽

@@ -12,7 +12,7 @@ catalogue_file = 'audio_data.yml'
 
 def parse_data_file(data_file):
     entries = []
-    with open(data_file, 'r') as file:
+    with open(data_file, 'r', encoding='utf-8') as file:
         lines = file.readlines()
         i = 0
         while i < len(lines):
@@ -43,7 +43,7 @@ def parse_data_file(data_file):
 def update_catalogue(catalogue_file, user_name, entries):
     # Read existing catalogue file (if it exists)
     try:
-        with open(catalogue_file, 'r') as file:
+        with open(catalogue_file, 'r', encoding='utf-8') as file:  # ✅ Apply UTF-8 encoding
             catalogue_data = file.read()
     except FileNotFoundError:
         catalogue_data = ''
@@ -72,7 +72,7 @@ def update_catalogue(catalogue_file, user_name, entries):
             f'\nusers:\n  {user_name}:\n' + new_entries_str
 
     # Write the updated data back to the catalogue file
-    with open(catalogue_file, 'w') as file:
+    with open(catalogue_file, 'w', encoding='utf-8') as file:  # ✅ Write with UTF-8 encoding
         file.write(updated_catalogue)
 
 
@@ -81,7 +81,7 @@ def update_catalogue(catalogue_file, user_name, entries):
 # Parse data from data.txt
 entries = parse_data_file(data_file)
 
-# Update audio_data.yml for user Hmph
-update_catalogue(catalogue_file, 'Hmph', entries)
+# Update audio_data.yml for user IvyWilde
+update_catalogue(catalogue_file, 'IvyWilde', entries)
 
 print("Catalogue updated successfully!")

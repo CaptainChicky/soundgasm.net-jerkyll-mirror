@@ -14,13 +14,35 @@ module Jekyll
       # Load the 'audio_data' from the _data/audio_data.yml file
       audio_data = site.data['audio_data']['users']
 
+      # stores generated files to check duplicates
+      generated_files = {}
+
       # Iterate over each user in the audio data
       audio_data.each do |user, entries|
+
+        # Check if the user has already been processed to avoid duplicates
+        generated_files[user] ||= {}
+
         # Iterate over each audio entry for this user
         entries.each do |entry|
+
+          # Check if the entry has already been processed to avoid duplicates
+          base_name = entry['title'].parameterize
+          unique_name = base_name
+          count = 1
+
+          # Ensure uniqueness of the filename
+          while generated_files[user].key?(unique_name)
+            unique_name = "#{base_name}-#{count}"
+            count += 1
+          end
+
+          # Store the unique name to prevent duplicates
+          generated_files[user][unique_name] = true
+
           # For each audio entry, create a new AudioEntryPage
           # This page will be created for the user and entry by calling the AudioEntryPage class
-          site.pages << AudioEntryPage.new(site, site.source, user, entry)
+          site.pages << AudioEntryPage.new(site, site.source, user, entry, unique_name)
         end
       end
     end
@@ -29,7 +51,7 @@ module Jekyll
   # Define a class for representing an individual audio entry page
   class AudioEntryPage < Page
     # Initialize the AudioEntryPage with the site, base, user, and entry data
-    def initialize(site, base, user, entry)
+    def initialize(site, base, user, entry, unique_name)
       @site = site 
       @base = base 
 
@@ -37,7 +59,7 @@ module Jekyll
       @dir = File.join('u', user) # makes /u/username/entry-title.html
 
       # Set the page name based on the audio entry title, parameterized to be URL-safe
-      @name = "#{entry['title'].parameterize}.html"  # Makes a filename like 'my-cool-audio.html'
+      @name = "#{unique_name}.html" # Makes a filename like 'my-cool-audio-n.html'
 
       # Process the page (set up the page with the correct name)
       self.process(@name)

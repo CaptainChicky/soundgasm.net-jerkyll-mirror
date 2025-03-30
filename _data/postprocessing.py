@@ -18,7 +18,7 @@ def read_audio_file(audio_file_path):
 
 # Function to read catalogue.txt and update it with the audio file names
 def update_catalogue_file(catalogue_file_path, audio_mapping):
-    with open(catalogue_file_path, 'r') as catalogue_file:
+    with open(catalogue_file_path, 'r', encoding='utf-8') as catalogue_file:
         catalogue_lines = catalogue_file.readlines()
 
     # Processing catalogue file to add audio filename
@@ -45,7 +45,7 @@ def update_catalogue_file(catalogue_file_path, audio_mapping):
             updated_lines.append(line)
 
     # Write the updated catalogue to the file
-    with open(catalogue_file_path, 'w') as catalogue_file:
+    with open(catalogue_file_path, 'w', encoding='utf-8') as catalogue_file:
         catalogue_file.writelines(updated_lines)
 
 # Paths to the files

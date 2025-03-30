@@ -6,9 +6,4 @@ You can look over all the html files in the root and `/u/`, `/passwordreset/`, a
 
 `/assets/` contains all the website css\/images\/js whatever, ideally don't change that.
 
-amogus testing
-ef
-
-
-
 `/media/` contains your actual audio files, which I've changed from what t

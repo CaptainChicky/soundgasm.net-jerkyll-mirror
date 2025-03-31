@@ -56,7 +56,10 @@ since this is always overridden by the scripts in `/_plugins/`, but I kept it in
 
 ## Auto-archiving Audio
 
-I spent some time writing (50% GPT again lmao) `archiving.py`, which automatically updates `audio_data.yml` with metadata and saves the audio, given a soundgasm link. It may be buggy, use with care. Always use the backup file `audio_data.yml.bak` before running the script.
+I spent some time writing (50% GPT again lmao) `archiving.py`, which automatically updates `audio_data.yml` with metadata and saves the audio, given a soundgasm link. It may be buggy, use with care. Always use the backup file `audio_data.yml.bak` before running the script. 
+
+GPT summary of the code below:
+This Python script extracts and processes metadata from an audio webpage, saving the results in a YAML file. It first checks if a YAML file (audio_data.yml) exists, creating it if necessary. The script then fetches various details from the webpage, including the username, title, description, playcount, and audio file URL. It downloads the audio file and stores it in a designated directory for the user. The metadata (username, title, description, playcount, and filename) is added to an array and subsequently saved into the YAML file. The playcount is post-processed to replace non-numeric values with random characters from a predefined list. Finally, the modified YAML file is written back to disk.
 
 For reference, here are unicode chars you can use for the replacements array: https://www.reddit.com/r/Unicode/comments/5qa7e7/widestlongest_unicode_characters_list/
 

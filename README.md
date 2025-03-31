@@ -43,8 +43,7 @@ When audios are privated, you are unable to access the `playcount`, so I just pu
 1. ﷽
 2. 𒐫
 3. 𒈙
-4. ⸻
-5. ꧅
+4. ꧅
 
 Should note that in `_config.yml` technically you really don't need to include
 ```yaml
@@ -54,6 +53,12 @@ collections:
     permalink: "{{ site.baseurl }}/u/:path/:title.html"
 ```
 since this is always overridden by the scripts in `/_plugins/`, but I kept it in anyways whatever.
+
+## Auto-archiving Audio
+
+I spent some time writing (50% GPT again lmao) `archiving.py`, which automatically updates `audio_data.yml` with metadata and saves the audio, given a soundgasm link. It may be buggy, use with care. Always use the backup file `audio_data.yml.bak` before running the script.
+
+For reference, here are unicode chars you can use for the replacements array: https://www.reddit.com/r/Unicode/comments/5qa7e7/widestlongest_unicode_characters_list/
 
 ## Building
 

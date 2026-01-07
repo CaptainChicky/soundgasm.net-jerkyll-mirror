@@ -1,2 +1,14 @@
 # Site configuration needed for jerkyll to know what to start the site link as lol
 baseurl: ''
+
+exclude:
+  - .github/
+  - .gitattributes
+  - .gitignore
+  - archiving.py
+  - CNAME
+  - Gemfile
+  - Gemfile.lock
+  - index.py
+  - README.md
+  - LICENSE

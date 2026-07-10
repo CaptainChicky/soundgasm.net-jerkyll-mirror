@@ -61,10 +61,20 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
 
       - name: Check disk space after checkout
         run: |
           echo "=== Disk space after checkout ==="
+          df -h /
+
+      - name: Remove .git to free space
+        run: rm -rf .git
+
+      - name: Check disk space after removing .git
+        run: |
+          echo "=== Disk space after removing .git ==="
           df -h /
 
       - name: Setup Ruby

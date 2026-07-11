@@ -241,8 +241,8 @@ def postprocess_playcount_in_yaml():
     # Function to replace non-numeric playcount with a random character
     def replace_non_numeric_playcount(match):
         playcount_value = match.group(2).strip()  # Extract the value of playcount
-        if playcount_value.isdigit():
-            return match.group(0)  # If the playcount is a number, leave it unchanged
+        if playcount_value.isdigit() or playcount_value in replacements:
+            return match.group(0)  # If the playcount is a number (or already got unicoded), leave it unchanged
         else:
             # Replace non-numeric playcount with a random character from the replacements list
             random_replacement = random.choice(replacements)

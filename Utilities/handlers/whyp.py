@@ -1,5 +1,5 @@
 """
-Whyp handler — uses yt-dlp for Cloudflare-protected audio downloads.
+Whyp handler, uses yt-dlp for Cloudflare-protected audio downloads.
 
 Requirements: yt-dlp on PATH  (pip install yt-dlp)
 """
@@ -13,13 +13,13 @@ from ..config import resolve_author
 from ..registry import audio_metadata, register
 
 
-def get_metadata_whyp(url, **_kwargs):
+def get_metadata_whyp(url):
     if shutil.which("yt-dlp") is None:
         print("ERROR: yt-dlp not found on PATH.")
         print("  Install it:  pip install yt-dlp  (or grab the binary)")
         return
 
-    # ── Metadata via yt-dlp JSON dump ─────────────────────────────
+    # == Metadata via yt-dlp JSON dump =============================
     print("Fetching metadata via yt-dlp...")
     result = subprocess.run(["yt-dlp", "-j", url], capture_output=True, text=True)
     if result.returncode != 0:
@@ -35,7 +35,7 @@ def get_metadata_whyp(url, **_kwargs):
     view_count = info.get("view_count")
     playcount = str(view_count) if view_count is not None else "No playcount found"
 
-    # ── Audio filename from CDN URL ───────────────────────────────
+    # == Audio filename from CDN URL ===============================
     cdn_url = info.get("url", "")
     cdn_match = re.search(r'/([a-f0-9-]+\.\w+)\?', cdn_url)
     if cdn_match:
@@ -52,7 +52,7 @@ def get_metadata_whyp(url, **_kwargs):
     print(f"Extracted Playcount: {playcount}")
     print(f"Extracted Audio Filename: {audio_filename}")
 
-    # ── Download ──────────────────────────────────────────────────
+    # == Download ==================================================
     media_dir = f"./media/{username}"
     os.makedirs(media_dir, exist_ok=True)
     output_path = os.path.join(media_dir, audio_filename)

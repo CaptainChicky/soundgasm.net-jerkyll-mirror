@@ -1,5 +1,5 @@
 """
-Hotaudio handler — uses Playwright to drive a real browser, inject MSE
+Hotaudio handler, uses Playwright to drive a real browser, inject MSE
 hooks, and capture decrypted audio + metadata.
 
 Requirements:
@@ -23,12 +23,12 @@ from pathlib import Path
 from ..config import resolve_author
 from ..registry import audio_metadata, register
 
-# ── Constants ─────────────────────────────────────────────────────────
+# == Constants =========================================================
 INJECT_JS = (Path(__file__).parent / "hotaudio_inject.js").read_text()
 PROFILE_DIR = os.path.expanduser("~/.hotaudio_profile")
 PLAYBACK_SPEED = float(os.environ.get("HOTAUDIO_SPEED", "2"))
 
-# ── Lazy Playwright state ─────────────────────────────────────────────
+# == Lazy Playwright state =============================================
 _pw = None
 _browser = None
 
@@ -74,8 +74,8 @@ def close_browser():
         _pw = None
 
 
-# ── Main handler ──────────────────────────────────────────────────────
-def get_metadata_hotaudio(url, speed=None, **_kwargs):
+# == Main handler ======================================================
+def get_metadata_hotaudio(url, speed=None):
     """
     Navigate to a hotaudio URL, hook MSE, play the audio at the
     requested speed, wait for it to finish, then extract metadata +
@@ -83,8 +83,8 @@ def get_metadata_hotaudio(url, speed=None, **_kwargs):
 
     Args:
         url:   hotaudio post URL (e.g. https://hotaudio.net/u/User/slug)
-        speed: playback speed override (0.5–2.0).  None = HOTAUDIO_SPEED
-               env var (default 2).  Stay ≤2 to avoid cipher drift.
+        speed: playback speed override (0.5-2.0).  None = HOTAUDIO_SPEED
+               env var (default 2).  Stay <=2 to avoid cipher drift.
     """
     playback_speed = speed if speed is not None else PLAYBACK_SPEED
     playback_speed = max(0.5, min(playback_speed, 2.0))
@@ -92,15 +92,15 @@ def get_metadata_hotaudio(url, speed=None, **_kwargs):
     page = browser.new_page()
 
     try:
-        # ── 1. Inject hooks before any page JS ────────────────────
+        # == 1. Inject hooks before any page JS ====================
         page.add_init_script(INJECT_JS)
 
-        # ── 2. Navigate ───────────────────────────────────────────
+        # == 2. Navigate ===========================================
         print(f"Navigating to {url} ...")
         page.goto(url, wait_until="domcontentloaded", timeout=30_000)
         page.wait_for_timeout(3000)
 
-        # ── 3. Scrape metadata from the DOM ───────────────────────
+        # == 3. Scrape metadata from the DOM =======================
         metadata = page.evaluate("""() => {
             const pb = document.getElementById('postbody');
             if (!pb) return { error: 'no #postbody found' };
@@ -180,7 +180,7 @@ def get_metadata_hotaudio(url, speed=None, **_kwargs):
         print(f"  Tags:         {', '.join(tags)}")
         print(f"  Length:       {length}")
 
-        # ── 4. Start playback ─────────────────────────────────────
+        # == 4. Start playback =====================================
         speed_map = {
             0.5: "0.5x", 0.75: "0.75x", 1.0: "1.0x",
             1.25: "1.25x", 1.5: "1.5x", 1.75: "1.75x", 2.0: "2.0x",
@@ -245,7 +245,7 @@ def get_metadata_hotaudio(url, speed=None, **_kwargs):
 
         print("  Playback confirmed — chunks flowing.")
 
-        # ── 5. Wait for playback to end ───────────────────────────
+        # == 5. Wait for playback to end ===========================
         wait_timeout_ms = 45 * 60 * 1000
         if length:
             try:
@@ -286,7 +286,7 @@ def get_metadata_hotaudio(url, speed=None, **_kwargs):
                 print(f"  Warning: 'ended' event didn't fire (progress: {progress}), "
                       f"but we have {chunk_count} chunks. Continuing.")
 
-        # ── 6. Extract chunks ─────────────────────────────────────
+        # == 6. Extract chunks =====================================
         print("  Extracting audio chunks...")
         audio_data = page.evaluate("""() => {
             const st = window.__INTERCEPTOR;
@@ -321,7 +321,7 @@ def get_metadata_hotaudio(url, speed=None, **_kwargs):
         mime = audio_data["mimeType"]
         print(f"  Captured {chunk_count} chunks, {total_bytes} bytes, MIME: {mime}")
 
-        # ── 7. Save to disk ───────────────────────────────────────
+        # == 7. Save to disk =======================================
         ext = "m4a" if "mp4" in mime else "webm"
         slug_match = re.search(r'/u/[^/]+/([^/?#]+)', url)
         if slug_match:
@@ -343,7 +343,7 @@ def get_metadata_hotaudio(url, speed=None, **_kwargs):
                 f.write(audio_bytes)
             print(f"  Saved: {output_path}")
 
-        # ── 8. Append to shared metadata ──────────────────────────
+        # == 8. Append to shared metadata ==========================
         audio_metadata.append([username, title, description, playcount, audio_filename])
         print(f"  Done. audio_metadata now has {len(audio_metadata)} entries.")
 
@@ -379,7 +379,7 @@ def _download_via_browser(page):
         return None
 
 
-# ── Auto-register ─────────────────────────────────────────────────────
+# == Auto-register =====================================================
 # Only registers if Playwright is actually installed; otherwise the
 # import is silently skipped by handlers/__init__.py.
 register("hotaudio", "hotaudio", get_metadata_hotaudio)

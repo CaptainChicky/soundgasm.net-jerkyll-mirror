@@ -1,12 +1,11 @@
 """
-Audiochan handler — uses gallery-dl for metadata extraction and downloads.
+Audiochan handler, uses gallery-dl for metadata extraction and downloads.
 
 Requirements: gallery-dl on PATH  (pip install gallery-dl)
 """
 import glob
 import json
 import os
-import re
 import shutil
 import subprocess
 
@@ -14,13 +13,13 @@ from ..config import resolve_author
 from ..registry import audio_metadata, register
 
 
-def get_metadata_audiochan(url, **_kwargs):
+def get_metadata_audiochan(url):
     if shutil.which("gallery-dl") is None:
         print("ERROR: gallery-dl not found on PATH.")
         print("  Install it:  pip install gallery-dl  (or grab the binary)")
         return
 
-    # ── Metadata via gallery-dl JSON dump ─────────────────────────
+    # == Metadata via gallery-dl JSON dump =========================
     print("Fetching metadata via gallery-dl...")
     result = subprocess.run(
         ["gallery-dl", "-j", url], capture_output=True, text=True,
@@ -52,7 +51,7 @@ def get_metadata_audiochan(url, **_kwargs):
         print(f"Raw output:\n{result.stdout[:500]}")
         return
 
-    # ── Parse fields ──────────────────────────────────────────────
+    # == Parse fields ==============================================
     user_obj = info.get("user") or {}
     username = user_obj.get("username") or user_obj.get("display_name") or "unknown_audiochan_user"
     username = resolve_author(username)
@@ -80,7 +79,7 @@ def get_metadata_audiochan(url, **_kwargs):
     print(f"Extracted Playcount: {playcount}")
     print(f"Extracted Audio Filename: {audio_filename}")
 
-    # ── Download ──────────────────────────────────────────────────
+    # == Download ==================================================
     media_dir = f"./media/{username}"
     os.makedirs(media_dir, exist_ok=True)
     output_path = os.path.join(media_dir, audio_filename)

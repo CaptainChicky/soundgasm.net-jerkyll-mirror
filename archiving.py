@@ -3,6 +3,7 @@
 Requirements:
   pip install requests beautifulsoup4
   yt-dlp on PATH (for whyp.it)
+  gallery-dl on PATH (for audiochan)
 """
 import os
 import random

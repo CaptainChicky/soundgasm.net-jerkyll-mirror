@@ -5,10 +5,8 @@ exclude:
   - .github/
   - .gitattributes
   - .gitignore
-  - archiving.py
-  - CNAME
+  - Utilities/
   - Gemfile
   - Gemfile.lock
-  - index.py
   - README.md
   - LICENSE

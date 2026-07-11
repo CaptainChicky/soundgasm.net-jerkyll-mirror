@@ -407,7 +407,7 @@ urls = [
     # "https://soundgasm.net/u/sinthyasanguine/some-audio-title",
     # whyp example:
     # "https://whyp.it/tracks/349458/f4m-skitty-wants-to-play-with-her-fav-toy-you-lubey-handjob-gentle-needy",
-    "https://whyp.it/tracks/349458/f4m-skitty-wants-to-play-with-her-fav-toy-you-lubey-handjob-gentle-needy"
+    "https://whyp.it/tracks/349687/step-into-pink?token=trE3c"
 ]
 
 for url in urls:

@@ -9,7 +9,7 @@ import requests
 from bs4 import BeautifulSoup
 
 from ..config import resolve_author
-from ..registry import audio_metadata, HANDLERS
+from ..registry import audio_metadata, register
 
 
 def get_metadata_soundgasm(url, **_kwargs):
@@ -83,4 +83,4 @@ def get_metadata_soundgasm(url, **_kwargs):
     audio_metadata.append([username, title, description, playcount, audio_filename])
 
 
-HANDLERS["soundgasm"] = get_metadata_soundgasm
+register("soundgasm", "soundgasm.net", get_metadata_soundgasm)

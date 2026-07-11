@@ -10,7 +10,7 @@ import shutil
 import subprocess
 
 from ..config import resolve_author
-from ..registry import audio_metadata, HANDLERS
+from ..registry import audio_metadata, register
 
 
 def get_metadata_whyp(url, **_kwargs):
@@ -72,4 +72,4 @@ def get_metadata_whyp(url, **_kwargs):
     audio_metadata.append([username, title, description, playcount, audio_filename])
 
 
-HANDLERS["whyp"] = get_metadata_whyp
+register("whyp", "whyp.it", get_metadata_whyp)

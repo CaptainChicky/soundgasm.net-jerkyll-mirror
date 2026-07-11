@@ -12,12 +12,21 @@ Requirements:
     pip install playwright     (for hotaudio, optional)
     playwright install chromium
 """
+import importlib
 
 from .yaml_store import ensure_yaml_exists, save_metadata_to_yaml, postprocess_playcount_in_yaml
 from .registry import get_metadata
 
-# Importing handlers auto-registers them into HANDLERS
-from . import handlers  # noqa: F401
+# ── Load handlers (each module's register() call fires on import) ─────
+for _mod in ("soundgasm", "whyp", "audiochan"):
+    importlib.import_module(f".handlers.{_mod}", __package__)
+
+_HAS_HOTAUDIO = False
+try:
+    importlib.import_module(".handlers.hotaudio", __package__)
+    _HAS_HOTAUDIO = True
+except (ImportError, FileNotFoundError) as e:
+    print(f"Note: hotaudio handler unavailable ({e})")
 
 
 # ── URL list ──────────────────────────────────────────────────────────
@@ -58,7 +67,7 @@ def main():
     postprocess_playcount_in_yaml()
 
     # Clean up Playwright if it was used
-    if handlers.HAS_HOTAUDIO:
+    if _HAS_HOTAUDIO:
         from .handlers.hotaudio import close_browser
         close_browser()
 

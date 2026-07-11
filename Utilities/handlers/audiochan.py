@@ -11,7 +11,7 @@ import shutil
 import subprocess
 
 from ..config import resolve_author
-from ..registry import audio_metadata, HANDLERS
+from ..registry import audio_metadata, register
 
 
 def get_metadata_audiochan(url, **_kwargs):
@@ -121,4 +121,4 @@ def get_metadata_audiochan(url, **_kwargs):
     audio_metadata.append([username, title, description, playcount, audio_filename])
 
 
-HANDLERS["audiochan"] = get_metadata_audiochan
+register("audiochan", "audiochan", get_metadata_audiochan)

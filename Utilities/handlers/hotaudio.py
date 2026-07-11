@@ -21,7 +21,7 @@ import re
 from pathlib import Path
 
 from ..config import resolve_author
-from ..registry import audio_metadata, HANDLERS
+from ..registry import audio_metadata, register
 
 # ── Constants ─────────────────────────────────────────────────────────
 INJECT_JS = (Path(__file__).parent / "hotaudio_inject.js").read_text()
@@ -382,4 +382,4 @@ def _download_via_browser(page):
 # ── Auto-register ─────────────────────────────────────────────────────
 # Only registers if Playwright is actually installed; otherwise the
 # import is silently skipped by handlers/__init__.py.
-HANDLERS["hotaudio"] = get_metadata_hotaudio
+register("hotaudio", "hotaudio", get_metadata_hotaudio)

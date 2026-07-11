@@ -407,7 +407,34 @@ urls = [
     # "https://soundgasm.net/u/sinthyasanguine/some-audio-title",
     # whyp example:
     # "https://whyp.it/tracks/349458/f4m-skitty-wants-to-play-with-her-fav-toy-you-lubey-handjob-gentle-needy",
-    "https://whyp.it/tracks/349687/step-into-pink?token=trE3c"
+    "https://whyp.it/tracks/349510/justfuckme?token=gMhau",
+    "https://whyp.it/tracks/353136/goodboy",
+    "https://whyp.it/tracks/353133/hiccup",
+    "https://whyp.it/tracks/345382/f4m-my-big-futa-sister-fdom-big-sister-little-brother-dickgirl-caught-you-looking-bribe",
+    "https://whyp.it/tracks/345374/f4m-mommy-educates-her-good-boy-femdom-inexperienced-listener-smoochies",
+    "https://whyp.it/tracks/343656/f4a-yes-you-can-affirmations-gentle-youre-enough-its-okay-my-smart-cookie-short",
+    "https://whyp.it/tracks/340729/f4m-locked-short-demanding-angy-small-dom-lol-sph-mean-caged-peen-anon-prompt",
+    "https://whyp.it/tracks/338280/f4m-f4nb-small-brat-fucks-with-you-because-she-wants-to-be-punished-french-ish",
+    "https://whyp.it/tracks/334324/meow",
+    "https://whyp.it/tracks/329594/f4a-whatcha-think-sibs-no-sex-slice-of-life-is-my-bra-sexy",
+    "https://whyp.it/tracks/327197/f4ma-bad-puppy-fdom-petplay-bdsm-step-on-you-short",
+    "https://whyp.it/tracks/325658/f4m-student-blows-her-favorite-professor-fsub-consensual-kiss-blowjob-yes-sir-18",
+    "https://whyp.it/tracks/323449/f4m-cold-shower-sfw-friend-comforting-a-sad-listener-making-you-smile-love-you-x1",
+    "https://whyp.it/tracks/312736/f4m-let-it-all-out-short-finish-good-boy",
+    "https://whyp.it/tracks/308407/f4ma-so-hot-short-sweaty-undressing-bra-you-want-my-panties",
+    "https://whyp.it/tracks/296646/f4a-cuffed-3dio-short-restrained",
+    "https://whyp.it/tracks/296645/blooper-skitty-getting-cuffs-on-3dio",
+    "https://whyp.it/tracks/282188/f4mtf-caged-short-fdom-ass",
+    "https://whyp.it/tracks/282182/f4a-please-short-voyeurism",
+    "https://whyp.it/tracks/210115/f4a-bad-ending-witchy-girlfriend-shrinks-you-with-her-boob-milk",
+    "https://whyp.it/tracks/151615/f4a-nonconsensual",
+    "https://whyp.it/tracks/146143/f4m-foot-sniff",
+    "https://whyp.it/tracks/145403/f4f-mistletoe-collar-for-christmas",
+    "https://whyp.it/tracks/145401/f4m-mistletoe-collar-for-christmas",
+    "https://whyp.it/tracks/143212/ff4m-french-documentarian-spies-on-mommy-her-good-boy",
+    "https://whyp.it/tracks/218615/skitty-blames-nosebleed-on-sexy-script-blooper-fwb-preview",
+    "https://whyp.it/tracks/272961/phub-doesnt-like-it-when-i-bully-you-succubus-preview",
+    "https://whyp.it/tracks/333841/f4m-skitty-teaches-you-to-masturbate-mommydom-super-gentle-comforting-hj-bj-praise"
 ]
 
 for url in urls:

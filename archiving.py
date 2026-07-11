@@ -51,8 +51,8 @@ def detect_site(url):
         return "whyp"
     # elif "hotaudio" in url:
     #     return "hotaudio"
-    # elif "audiochan" in url:
-    #     return "audiochan"
+    elif "audiochan" in url:
+        return "audiochan"
     else:
         return None
 
@@ -266,6 +266,133 @@ def get_metadata_whyp(url):
 
 HANDLERS["whyp"] = get_metadata_whyp
 
+#=======================================================================
+# Audiochan handler (gallery-dl for download + metadata)
+# requires gallery-dl on PATH
+#=======================================================================
+def get_metadata_audiochan(url):
+    if shutil.which("gallery-dl") is None:
+        print("ERROR: gallery-dl not found on PATH.")
+        print("  Install it:  pip install gallery-dl  (or grab the binary)")
+        return
+
+    # =======================================================================
+    # Get metadata via gallery-dl JSON dump (no download yet)
+    print("Fetching metadata via gallery-dl...")
+    meta_result = subprocess.run(
+        ["gallery-dl", "-j", url],
+        capture_output=True, text=True
+    )
+
+    if meta_result.returncode != 0:
+        print(f"gallery-dl metadata extraction failed:\n{meta_result.stderr}")
+        return
+
+    # gallery-dl -j returns one big pretty-printed JSON array
+    try:
+        entries = json.loads(meta_result.stdout)
+    except json.JSONDecodeError as e:
+        print(f"Could not parse gallery-dl JSON output: {e}")
+        print(f"Raw output:\n{meta_result.stdout[:500]}")
+        return
+
+    info = None
+    for entry in entries:
+        if not isinstance(entry, list) or len(entry) < 2:
+            continue
+        if entry[0] == 3 and len(entry) >= 3:
+            info = entry[2]
+            break
+        elif entry[0] == 2 and info is None:
+            info = entry[1]
+
+    if info is None:
+        print("Could not extract metadata from gallery-dl output.")
+        print(f"Raw output:\n{meta_result.stdout[:500]}")
+        return
+
+    # =======================================================================
+    # Extract metadata using exact audiochan field names
+    user_obj = info.get("user") or {}
+    username = user_obj.get("username") or user_obj.get("display_name") or "unknown_audiochan_user"
+    username = resolve_author(username)
+
+    title = info.get("title") or "No title found"
+
+    # description is a list of strings on audiochan
+    desc_raw = info.get("description")
+    if isinstance(desc_raw, list):
+        description = "\n".join(desc_raw)
+    elif isinstance(desc_raw, str):
+        description = desc_raw
+    else:
+        description = "No description found"
+
+    # valid_listens is total all-time listens
+    listen_count = info.get("valid_listens")
+    playcount = str(listen_count) if listen_count is not None else "No playcount found"
+
+    # slug is the unique track ID in the URL, extension comes from the type-3 entry
+    slug = info.get("slug") or str(info.get("id", "unknown"))
+    ext = info.get("extension") or "mp3"
+    audio_filename = f"{slug}.{ext}"
+
+    print(f"Extracted Username: {username}")
+    print(f"Extracted Title: {title}")
+    print(f"Extracted Description: {description[:100]}...")
+    print(f"Extracted Playcount: {playcount}")
+    print(f"Extracted Audio Filename: {audio_filename}")
+
+    # =======================================================================
+    # Download the audio file via gallery-dl
+    media_dir = f"./media/{username}"
+    os.makedirs(media_dir, exist_ok=True)
+
+    output_path = os.path.join(media_dir, audio_filename)
+
+    if os.path.exists(output_path):
+        print(f"File already exists: {output_path}. Skipping download.")
+    else:
+        print(f"Downloading audio to {media_dir}...")
+        dl_result = subprocess.run(
+            [
+                "gallery-dl",
+                "-d", ".",
+                "-o", f'directory=["media", "{username}"]',
+                "-o", f'filename={slug}.{{extension}}',
+                url,
+            ],
+            capture_output=True, text=True
+        )
+
+        if dl_result.returncode != 0:
+            print(f"gallery-dl download failed:\n{dl_result.stderr}")
+            return
+
+        # if gallery-dl ignored our output overrides, hunt for the file
+        if not os.path.exists(output_path):
+            import glob
+            # check gallery-dl's default tree
+            default_dir = os.path.join(".", "gallery-dl", "audiochan", username)
+            candidates = glob.glob(os.path.join(default_dir, "*"))
+            if candidates:
+                actual = max(candidates, key=os.path.getmtime)
+                dest = os.path.join(media_dir, audio_filename)
+                shutil.move(actual, dest)
+                print(f"Moved {actual} -> {dest}")
+            else:
+                print(f"Warning: could not locate downloaded file.")
+                print(f"gallery-dl stdout:\n{dl_result.stdout}")
+                return
+
+        print(f"Downloaded audio file: {output_path}")
+
+    # Add the raw content to the global array
+    audio_metadata.append([username, title, description, playcount, audio_filename])
+
+    print(f"Current audio_metadata array: {audio_metadata}")
+
+HANDLERS["audiochan"] = get_metadata_audiochan
 
 # Helper function to extract existing audio filenames for a user from YAML
 def get_existing_user_audios(yaml_content, username):
@@ -407,34 +534,7 @@ urls = [
     # "https://soundgasm.net/u/sinthyasanguine/some-audio-title",
     # whyp example:
     # "https://whyp.it/tracks/349458/f4m-skitty-wants-to-play-with-her-fav-toy-you-lubey-handjob-gentle-needy",
-    "https://whyp.it/tracks/349510/justfuckme?token=gMhau",
-    "https://whyp.it/tracks/353136/goodboy",
-    "https://whyp.it/tracks/353133/hiccup",
-    "https://whyp.it/tracks/345382/f4m-my-big-futa-sister-fdom-big-sister-little-brother-dickgirl-caught-you-looking-bribe",
-    "https://whyp.it/tracks/345374/f4m-mommy-educates-her-good-boy-femdom-inexperienced-listener-smoochies",
-    "https://whyp.it/tracks/343656/f4a-yes-you-can-affirmations-gentle-youre-enough-its-okay-my-smart-cookie-short",
-    "https://whyp.it/tracks/340729/f4m-locked-short-demanding-angy-small-dom-lol-sph-mean-caged-peen-anon-prompt",
-    "https://whyp.it/tracks/338280/f4m-f4nb-small-brat-fucks-with-you-because-she-wants-to-be-punished-french-ish",
-    "https://whyp.it/tracks/334324/meow",
-    "https://whyp.it/tracks/329594/f4a-whatcha-think-sibs-no-sex-slice-of-life-is-my-bra-sexy",
-    "https://whyp.it/tracks/327197/f4ma-bad-puppy-fdom-petplay-bdsm-step-on-you-short",
-    "https://whyp.it/tracks/325658/f4m-student-blows-her-favorite-professor-fsub-consensual-kiss-blowjob-yes-sir-18",
-    "https://whyp.it/tracks/323449/f4m-cold-shower-sfw-friend-comforting-a-sad-listener-making-you-smile-love-you-x1",
-    "https://whyp.it/tracks/312736/f4m-let-it-all-out-short-finish-good-boy",
-    "https://whyp.it/tracks/308407/f4ma-so-hot-short-sweaty-undressing-bra-you-want-my-panties",
-    "https://whyp.it/tracks/296646/f4a-cuffed-3dio-short-restrained",
-    "https://whyp.it/tracks/296645/blooper-skitty-getting-cuffs-on-3dio",
-    "https://whyp.it/tracks/282188/f4mtf-caged-short-fdom-ass",
-    "https://whyp.it/tracks/282182/f4a-please-short-voyeurism",
-    "https://whyp.it/tracks/210115/f4a-bad-ending-witchy-girlfriend-shrinks-you-with-her-boob-milk",
-    "https://whyp.it/tracks/151615/f4a-nonconsensual",
-    "https://whyp.it/tracks/146143/f4m-foot-sniff",
-    "https://whyp.it/tracks/145403/f4f-mistletoe-collar-for-christmas",
-    "https://whyp.it/tracks/145401/f4m-mistletoe-collar-for-christmas",
-    "https://whyp.it/tracks/143212/ff4m-french-documentarian-spies-on-mommy-her-good-boy",
-    "https://whyp.it/tracks/218615/skitty-blames-nosebleed-on-sexy-script-blooper-fwb-preview",
-    "https://whyp.it/tracks/272961/phub-doesnt-like-it-when-i-bully-you-succubus-preview",
-    "https://whyp.it/tracks/333841/f4m-skitty-teaches-you-to-masturbate-mommydom-super-gentle-comforting-hj-bj-praise"
+    "https://audiochan.com/a/nCj5FelUwcXTJOMrFL"
 ]
 
 for url in urls:

@@ -1,7 +1,16 @@
+#!/usr/bin/env python3
+"""
+Requirements:
+  pip install requests beautifulsoup4
+  yt-dlp on PATH (for whyp.it)
+"""
 import os
 import random
 import requests
 import re
+import subprocess
+import json
+import shutil
 from bs4 import BeautifulSoup
 
 YAML_FILE = "_data/audio_data.yml"
@@ -25,8 +34,46 @@ else:
     print(f"{YAML_FILE} already exists.")
 
 
-# Step 2: Extract username from the webpage and add to the array
+# Detect which site a URL belongs to
+def detect_site(url):
+    if "soundgasm.net" in url:
+        return "soundgasm"
+    elif "whyp.it" in url:
+        return "whyp"
+    # elif "hotaudio" in url:
+    #     return "hotaudio"
+    # elif "audiochan" in url:
+    #     return "audiochan"
+    else:
+        return None
+
+
+# Step 2: Extract metadata from the webpage and add to the array
+# Routes to the right handler based on the URL
+
+HANDLERS = {}
+
 def get_metadata(url):
+    site = detect_site(url)
+    if site is None:
+        print(f"Unsupported site: {url}")
+        return
+
+    print(f"\n{'=' * 60}")
+    print(f"[{site}] {url}")
+    print(f"{'=' * 60}")
+
+    handler = HANDLERS.get(site)
+    if handler:
+        handler(url)
+    else:
+        print(f"No handler implemented for site: {site}")
+
+
+#=======================================================================
+# Soundgasm handler (direct scraping + requests download)
+#=======================================================================
+def get_metadata_soundgasm(url):
     response = requests.get(url)
     soup = BeautifulSoup(response.text, "html.parser")
 
@@ -121,6 +168,91 @@ def get_metadata(url):
     audio_metadata.append([username, title, description, playcount, audio_filename])
 
     print(f"Current audio_metadata array: {audio_metadata}")
+
+HANDLERS["soundgasm"] = get_metadata_soundgasm
+
+
+#=======================================================================
+# Whyp handler (yt-dlp for cloudflare-protected sites)
+# requires yt-dlp on PATH
+#=======================================================================
+def get_metadata_whyp(url):
+    if shutil.which("yt-dlp") is None:
+        print("ERROR: yt-dlp not found on PATH.")
+        print("  Install it:  pip install yt-dlp  (or grab the binary)")
+        return
+
+    # =======================================================================
+    # Get metadata via yt-dlp JSON dump (no download yet, -j is simulate only)
+    print("Fetching metadata via yt-dlp...")
+    meta_result = subprocess.run(
+        ["yt-dlp", "-j", url],
+        capture_output=True, text=True
+    )
+
+    if meta_result.returncode != 0:
+        print(f"yt-dlp metadata extraction failed:\n{meta_result.stderr}")
+        return
+
+    info = json.loads(meta_result.stdout)
+
+    username = info.get("uploader", "unknown_whyp_user")
+    title = info.get("title", "No title found")
+    description = info.get("description") or "No description found"
+
+    # whyp doesn't expose play counts via yt-dlp, so this will usually miss
+    view_count = info.get("view_count")
+    playcount = str(view_count) if view_count is not None else "No playcount found"
+
+    # =======================================================================
+    # Extract the CDN hash filename from the url field, same style as soundgasm
+    # e.g. "https://cdn.whyp.it/3c3b23bc-8f74-4cc1-8dae-0f1b4b32a354.mp3?token=..."
+    #  -> "3c3b23bc-8f74-4cc1-8dae-0f1b4b32a354.mp3"
+    cdn_url = info.get("url", "")
+    cdn_match = re.search(r'/([a-f0-9-]+\.\w+)\?', cdn_url)
+    if cdn_match:
+        audio_filename = cdn_match.group(1)
+    else:
+        # fallback to track ID if CDN URL doesn't match expected pattern
+        track_id = str(info.get("id", "unknown"))
+        ext = info.get("ext", "mp3")
+        audio_filename = f"{track_id}.{ext}"
+        print(f"Warning: couldn't extract CDN hash, falling back to {audio_filename}")
+
+    print(f"Extracted Username: {username}")
+    print(f"Extracted Title: {title}")
+    print(f"Extracted Description: {description[:100]}...")
+    print(f"Extracted Playcount: {playcount}")
+    print(f"Extracted Audio Filename: {audio_filename}")
+
+    # =======================================================================
+    # Download the audio file via yt-dlp
+    media_dir = f"./media/{username}"
+    os.makedirs(media_dir, exist_ok=True)
+
+    output_path = os.path.join(media_dir, audio_filename)
+
+    if os.path.exists(output_path):
+        print(f"File already exists: {output_path}. Skipping download.")
+    else:
+        print(f"Downloading audio to {media_dir}...")
+        dl_result = subprocess.run(
+            ["yt-dlp", "-o", output_path, url],
+            capture_output=True, text=True
+        )
+
+        if dl_result.returncode != 0:
+            print(f"yt-dlp download failed:\n{dl_result.stderr}")
+            return
+
+        print(f"Downloaded audio file: {output_path}")
+
+    # Add the raw content to the global array
+    audio_metadata.append([username, title, description, playcount, audio_filename])
+
+    print(f"Current audio_metadata array: {audio_metadata}")
+
+HANDLERS["whyp"] = get_metadata_whyp
 
 
 # Helper function to extract existing audio filenames for a user from YAML
@@ -256,10 +388,19 @@ def postprocess_playcount_in_yaml():
         file.write(modified_yaml_content)
 
     print(f"Post-processing complete. Non-numeric playcounts replaced with random characters.")
-    
 
-url = "https://soundgasm.net/u/sinthyasanguine/That-Horse-Girl-Fucks-like-a-Stallion-Horse-Girl-Horse-EarsTail-Fdom-In-Heat-Teasing-Height-Difference-Muscles-A-little-Possessive-Blowjob-Thigh-Fucking-Amazon-Position-Thick-Thighs-Big-Ass"
-get_metadata(url)
+
+urls = [
+    # soundgasm example:
+    # "https://soundgasm.net/u/sinthyasanguine/some-audio-title",
+    # whyp example:
+    # "https://whyp.it/tracks/349458/f4m-skitty-wants-to-play-with-her-fav-toy-you-lubey-handjob-gentle-needy",
+    "https://whyp.it/tracks/349458/f4m-skitty-wants-to-play-with-her-fav-toy-you-lubey-handjob-gentle-needy"
+]
+
+for url in urls:
+    get_metadata(url)
+
 save_metadata_to_yaml()
 postprocess_playcount_in_yaml()
 

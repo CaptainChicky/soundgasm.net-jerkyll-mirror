@@ -8,7 +8,7 @@ import re
 import requests
 from bs4 import BeautifulSoup
 
-from ..config import resolve_author
+from ..config import resolve_author, log_ok, log_warn, log_error
 from ..registry import audio_metadata, register
 
 
@@ -18,12 +18,16 @@ def get_metadata_soundgasm(url):
 
     # == Username (from URL: soundgasm.net/u/{username}/{slug}) ====
     username = resolve_author(url.split("/u/")[1].split("/")[0])
-    print(f"Extracted Username: {username}")
+    log_ok(f"Username: {username}")
 
     # == Title =====================================================
     title_tag = soup.find("div", class_="jp-title", attrs={"aria-label": "title"})
-    title = title_tag.decode_contents() if title_tag else "No title found"
-    print(f"Extracted Raw Title: {title}")
+    if title_tag:
+        title = title_tag.decode_contents()
+        log_ok(f"Title: {title}")
+    else:
+        title = "No title found"
+        log_warn(f"Title not found for {url}")
 
     # == Description ===============================================
     desc_match = re.search(
@@ -33,10 +37,10 @@ def get_metadata_soundgasm(url):
     if desc_match:
         description = desc_match.group(1)
         description = description.replace("</p>\r\n      </div>\r\n      ", "")
-        print(f"Extracted Raw Description: {description[:100]}...")
+        log_ok(f"Description: {description[:80]}...")
     else:
         description = "No description found"
-        print("Description not found.")
+        log_warn(f"Description not found for {url}")
 
     # == Playcount (from the user's listing page) ==================
     base_url = "/".join(url.split("/")[:-1])
@@ -51,18 +55,22 @@ def get_metadata_soundgasm(url):
             m = re.search(r"Play Count:\s*(\d+)", span.text)
             if m:
                 playcount = m.group(1)
-    print(f"Extracted Playcount: {playcount}")
+
+    if playcount == "No playcount found":
+        log_warn(f"Playcount not found for {url}")
+    else:
+        log_ok(f"Playcount: {playcount}")
 
     # == Audio file ================================================
     audio_match = re.search(
         r'https://media\.soundgasm\.net/sounds/(.*?\.m4a)', response.text,
     )
     if not audio_match:
-        print("Audio file not found.")
+        log_error(f"Audio file not found for {url}")
         return
 
     audio_filename = audio_match.group(1)
-    print(f"Extracted Audio Filename: {audio_filename}")
+    log_ok(f"Audio filename: {audio_filename}")
 
     media_dir = f"./media/{username}"
     os.makedirs(media_dir, exist_ok=True)
@@ -71,7 +79,7 @@ def get_metadata_soundgasm(url):
     audio_path = os.path.join(media_dir, audio_filename)
     with open(audio_path, "wb") as f:
         f.write(requests.get(audio_url).content)
-    print(f"Downloaded audio file: {audio_path}")
+    log_ok(f"Downloaded: {audio_path}")
 
     audio_metadata.append([username, title, description, playcount, audio_filename])
 

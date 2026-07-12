@@ -9,30 +9,30 @@ import os
 import shutil
 import subprocess
 
-from ..config import resolve_author
+from ..config import resolve_author, log_ok, log_warn, log_error
 from ..registry import audio_metadata, register
 
 
 def get_metadata_audiochan(url):
     if shutil.which("gallery-dl") is None:
-        print("ERROR: gallery-dl not found on PATH.")
+        log_error("gallery-dl not found on PATH.")
         print("  Install it:  pip install gallery-dl  (or grab the binary)")
         return
 
     # == Metadata via gallery-dl JSON dump =========================
-    print("Fetching metadata via gallery-dl...")
+    print("  Fetching metadata via gallery-dl...")
     result = subprocess.run(
         ["gallery-dl", "-j", url], capture_output=True, text=True,
     )
     if result.returncode != 0:
-        print(f"gallery-dl metadata extraction failed:\n{result.stderr}")
+        log_error(f"gallery-dl metadata extraction failed:\n{result.stderr}")
         return
 
     try:
         entries = json.loads(result.stdout)
     except json.JSONDecodeError as e:
-        print(f"Could not parse gallery-dl JSON output: {e}")
-        print(f"Raw output:\n{result.stdout[:500]}")
+        log_error(f"Could not parse gallery-dl JSON output: {e}")
+        print(f"  Raw output:\n{result.stdout[:500]}")
         return
 
     # Find the best metadata entry (type-3 preferred, type-2 fallback)
@@ -47,8 +47,8 @@ def get_metadata_audiochan(url):
             info = entry[1]
 
     if info is None:
-        print("Could not extract metadata from gallery-dl output.")
-        print(f"Raw output:\n{result.stdout[:500]}")
+        log_error("Could not extract metadata from gallery-dl output.")
+        print(f"  Raw output:\n{result.stdout[:500]}")
         return
 
     # == Parse fields ==============================================
@@ -56,7 +56,16 @@ def get_metadata_audiochan(url):
     username = user_obj.get("username") or user_obj.get("display_name") or "unknown_audiochan_user"
     username = resolve_author(username)
 
+    if username == "unknown_audiochan_user":
+        log_error(f"Username not found, falling back to 'unknown_audiochan_user'")
+    else:
+        log_ok(f"Username: {username}")
+
     title = info.get("title") or "No title found"
+    if title == "No title found":
+        log_warn(f"Title not found for {url}")
+    else:
+        log_ok(f"Title: {title}")
 
     desc_raw = info.get("description")
     if isinstance(desc_raw, list):
@@ -66,18 +75,23 @@ def get_metadata_audiochan(url):
     else:
         description = "No description found"
 
+    if description == "No description found":
+        log_warn(f"Description not found for {url}")
+    else:
+        log_ok(f"Description: {description[:80]}...")
+
     listen_count = info.get("valid_listens")
-    playcount = str(listen_count) if listen_count is not None else "No playcount found"
+    if listen_count is not None:
+        playcount = str(listen_count)
+        log_ok(f"Playcount: {playcount}")
+    else:
+        playcount = "No playcount found"
+        log_warn(f"Playcount not found for {url}")
 
     slug = info.get("slug") or str(info.get("id", "unknown"))
     ext = info.get("extension") or "mp3"
     audio_filename = f"{slug}.{ext}"
-
-    print(f"Extracted Username: {username}")
-    print(f"Extracted Title: {title}")
-    print(f"Extracted Description: {description[:100]}...")
-    print(f"Extracted Playcount: {playcount}")
-    print(f"Extracted Audio Filename: {audio_filename}")
+    log_ok(f"Audio filename: {audio_filename}")
 
     # == Download ==================================================
     media_dir = f"./media/{username}"
@@ -85,9 +99,9 @@ def get_metadata_audiochan(url):
     output_path = os.path.join(media_dir, audio_filename)
 
     if os.path.exists(output_path):
-        print(f"File already exists: {output_path}. Skipping download.")
+        log_ok(f"File already exists: {output_path} — skipping download")
     else:
-        print(f"Downloading audio to {media_dir}...")
+        print(f"  Downloading audio to {media_dir}...")
         dl = subprocess.run(
             [
                 "gallery-dl",
@@ -99,7 +113,7 @@ def get_metadata_audiochan(url):
             capture_output=True, text=True,
         )
         if dl.returncode != 0:
-            print(f"gallery-dl download failed:\n{dl.stderr}")
+            log_error(f"gallery-dl download failed:\n{dl.stderr}")
             return
 
         # Hunt for the file if gallery-dl ignored our output overrides
@@ -109,13 +123,13 @@ def get_metadata_audiochan(url):
             if candidates:
                 actual = max(candidates, key=os.path.getmtime)
                 shutil.move(actual, output_path)
-                print(f"Moved {actual} -> {output_path}")
+                log_ok(f"Moved {actual} -> {output_path}")
             else:
-                print("Warning: could not locate downloaded file.")
-                print(f"gallery-dl stdout:\n{dl.stdout}")
+                log_error("Could not locate downloaded file.")
+                print(f"  gallery-dl stdout:\n{dl.stdout}")
                 return
 
-        print(f"Downloaded audio file: {output_path}")
+        log_ok(f"Downloaded: {output_path}")
 
     audio_metadata.append([username, title, description, playcount, audio_filename])
 

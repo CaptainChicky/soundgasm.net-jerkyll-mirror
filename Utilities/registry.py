@@ -4,6 +4,7 @@ Handler registry and URL dispatcher.
 Shared state (audio_metadata, handlers) lives here so every handler
 can append results without circular imports.
 """
+from .config import log_error
 
 # == Shared mutable state ==============================================
 audio_metadata = []   # [[username, title, description, playcount, filename], ...]
@@ -40,7 +41,7 @@ def get_metadata(url, **kwargs):
     """
     site = detect_site(url)
     if site is None:
-        print(f"Unsupported site: {url}")
+        log_error(f"Unsupported site: {url}")
         return
 
     print(f"\n{'=' * 60}")
@@ -49,7 +50,7 @@ def get_metadata(url, **kwargs):
 
     handler = _HANDLERS.get(site)
     if handler is None:
-        print(f"No handler registered for site: {site}")
+        log_error(f"No handler registered for site: {site}")
         return
 
     handler(url, **kwargs)

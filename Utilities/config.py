@@ -5,6 +5,7 @@ Everything that multiple modules need (paths, constants, lookup tables)
 lives here so no module imports from another handler.
 """
 import random
+import sys
 
 # == Paths =============================================================
 YAML_FILE = "_data/audio_data.yml"
@@ -26,3 +27,28 @@ def resolve_author(username):
 def random_playcount_replacement():
     """Pick a random unicode replacement for a missing playcount."""
     return random.choice(PLAYCOUNT_REPLACEMENTS)
+
+
+# == Console logging (coloured) ========================================
+# Works in VS Code terminal, Windows Terminal, and any modern terminal.
+def _supports_color():
+    return hasattr(sys.stdout, "isatty") and sys.stdout.isatty()
+
+
+_COLOR  = _supports_color()
+_RED    = "\033[1;31m" if _COLOR else ""
+_YELLOW = "\033[1;33m" if _COLOR else ""
+_GREEN  = "\033[1;32m" if _COLOR else ""
+_RESET  = "\033[0m"    if _COLOR else ""
+
+
+def log_error(msg):
+    print(f"{_RED}  ✗ ERROR: {msg}{_RESET}")
+
+
+def log_warn(msg):
+    print(f"{_YELLOW}  ⚠ WARN:  {msg}{_RESET}")
+
+
+def log_ok(msg):
+    print(f"{_GREEN}  ✓ {msg}{_RESET}")

@@ -20,7 +20,7 @@ import os
 import re
 from pathlib import Path
 
-from ..config import resolve_author
+from ..config import resolve_author, log_ok, log_warn, log_error
 from ..registry import audio_metadata, register
 
 # == Constants =========================================================
@@ -92,11 +92,20 @@ def get_metadata_hotaudio(url, speed=None):
     page = browser.new_page()
 
     try:
+        # == 0. Username from URL (authoritative) ==================
+        url_user_match = re.search(r'/u/([^/]+)/', url)
+        if url_user_match:
+            username = resolve_author(url_user_match.group(1))
+            log_ok(f"Username: {username}")
+        else:
+            username = "unknown_hotaudio_user"
+            log_warn(f"Could not extract username from URL: {url}")
+
         # == 1. Inject hooks before any page JS ====================
         page.add_init_script(INJECT_JS)
 
         # == 2. Navigate ===========================================
-        print(f"Navigating to {url} ...")
+        print(f"  Navigating to {url} ...")
         page.goto(url, wait_until="domcontentloaded", timeout=30_000)
         page.wait_for_timeout(3000)
 
@@ -106,17 +115,14 @@ def get_metadata_hotaudio(url, speed=None):
             if (!pb) return { error: 'no #postbody found' };
 
             const titleEl = pb.querySelector('span.text-2xl');
-            const title = titleEl ? titleEl.textContent.trim() : 'No title found';
+            const title = titleEl ? titleEl.textContent.trim() : null;
 
             const tagmDivs = pb.querySelectorAll('.tagm');
-            let performer = null, scriptwriter = null, length = null;
+            let scriptwriter = null, length = null;
             for (const div of tagmDivs) {
                 const spans = div.querySelectorAll('span');
                 const label = spans[0]?.textContent.trim().toLowerCase();
-                if (label === 'by') {
-                    const link = div.querySelector('a[href^="/u/"]');
-                    performer = link ? link.textContent.trim() : null;
-                } else if (label === 'script') {
+                if (label === 'script') {
                     const link = div.querySelector('a[href^="/u/"]');
                     scriptwriter = link ? link.textContent.trim() : null;
                 } else if (label === 'length') {
@@ -125,7 +131,7 @@ def get_metadata_hotaudio(url, speed=None):
             }
 
             const proseEl = pb.querySelector('.prose.prose-ha');
-            const description = proseEl ? proseEl.innerHTML.trim() : 'No description found';
+            const description = proseEl ? proseEl.innerHTML.trim() : null;
 
             const tidEls = pb.querySelectorAll('span[data-tid]');
             const trackEntries = Array.from(tidEls).map(el => ({
@@ -138,31 +144,60 @@ def get_metadata_hotaudio(url, speed=None):
 
             return {
                 title, description, length,
-                performer: performer || 'unknown_hotaudio_user',
                 scriptwriter, trackEntries, tags,
                 pageUrl: location.href,
             };
         }""")
 
         if metadata.get("error"):
-            print(f"  DOM scrape failed: {metadata['error']}")
+            log_error(f"DOM scrape failed: {metadata['error']}")
             return
 
-        # Fallback username from URL
-        url_user_match = re.search(r'/u/([^/]+)/', url)
-        username = metadata["performer"]
-        if username == "unknown_hotaudio_user" and url_user_match:
-            username = url_user_match.group(1)
-        username = resolve_author(username)
-
         title = metadata["title"]
+        if title:
+            log_ok(f"Title: {title}")
+        else:
+            title = "No title found"
+            log_warn(f"Title not found for {url}")
+
         description = metadata["description"]
+        if description:
+            log_ok(f"Description: {description[:80]}...")
+        else:
+            description = "No description found"
+            log_warn(f"Description not found for {url}")
+
         track_entries = metadata.get("trackEntries", [])
         tags = metadata.get("tags", [])
         length = metadata.get("length")
         playcount = "No playcount found"
 
-        # Pick best track ID
+        if metadata.get("scriptwriter"):
+            log_ok(f"Script by: {metadata['scriptwriter']}")
+
+        if track_entries:
+            log_ok(f"Track IDs: {track_entries}")
+        else:
+            log_warn("No track IDs found")
+
+        if tags:
+            log_ok(f"Tags: {', '.join(tags)}")
+        else:
+            log_warn("No tags found")
+
+        if length:
+            log_ok(f"Length: {length}")
+        else:
+            log_warn("Length not found")
+
+        log_warn("Playcount not available (hotaudio doesn't expose it)")
+
+        # Prepend tags to title in [Tag][Tag] format (matches soundgasm/Reddit style)
+        if tags:
+            title = " ".join(f"[{t}]" for t in tags) + " " + title
+            log_ok(f"Final title: {title[:120]}...")
+
+        # Pick best track ID (if it exists in DOM)
         track_id = None
         for te in track_entries:
             if re.search(r'\.\w{2,4}$', te.get("text", "")):
@@ -170,15 +205,6 @@ def get_metadata_hotaudio(url, speed=None):
                 break
         if track_id is None and track_entries:
             track_id = track_entries[0]["tid"]
-
-        print(f"  Username:     {username}")
-        print(f"  Title:        {title}")
-        if metadata.get("scriptwriter"):
-            print(f"  Script by:    {metadata['scriptwriter']}")
-        print(f"  Description:  {description[:80]}...")
-        print(f"  Track IDs:    {track_entries}")
-        print(f"  Tags:         {', '.join(tags)}")
-        print(f"  Length:       {length}")
 
         # == 4. Start playback =====================================
         speed_map = {
@@ -223,14 +249,14 @@ def get_metadata_hotaudio(url, speed=None):
             return btn ? btn.classList.contains('paused') : true;
         }""")
         if is_paused:
-            print("  Still paused — trying keyboard shortcut...")
+            log_warn("Still paused, trying keyboard shortcut...")
             page.keyboard.press("k")
             page.wait_for_timeout(2000)
 
         # Verify chunks are flowing
         chunks_started = page.evaluate("() => window.__INTERCEPTOR.chunks.length > 0")
         if not chunks_started:
-            print("  No chunks yet — trying direct audio.play()...")
+            log_warn("No chunks yet, trying direct audio.play()...")
             page.evaluate("""() => {
                 const el = window.__INTERCEPTOR.playerEl
                          || document.querySelector('audio')
@@ -240,10 +266,10 @@ def get_metadata_hotaudio(url, speed=None):
             page.wait_for_timeout(3000)
             chunks_started = page.evaluate("() => window.__INTERCEPTOR.chunks.length > 0")
             if not chunks_started:
-                print("  ERROR: Could not start playback. Hooks may have been blocked.")
+                log_error("Could not start playback. Hooks may have been blocked.")
                 return
 
-        print("  Playback confirmed — chunks flowing.")
+        log_ok("Playback confirmed, chunks flowing.")
 
         # == 5. Wait for playback to end ===========================
         wait_timeout_ms = 45 * 60 * 1000
@@ -255,7 +281,7 @@ def get_metadata_hotaudio(url, speed=None):
                     if m:
                         total_sec += int(m.group(1)) * mult
                 if total_sec > 0:
-                    real_sec = (total_sec / closest_speed) + 60
+                    real_sec = (total_sec / closest_speed) + 60 # 1 min buffer
                     wait_timeout_ms = int(real_sec * 1000)
                     print(f"  Computed timeout: {real_sec:.0f}s "
                           f"(track {total_sec}s at {closest_speed}x)")
@@ -276,15 +302,15 @@ def get_metadata_hotaudio(url, speed=None):
             chunk_count = page.evaluate("() => window.__INTERCEPTOR.chunks.length")
 
             if chunk_count == 0:
-                print(f"  ERROR: Playback never started or hooks failed: {e}")
+                log_error(f"Playback never started or hooks failed: {e}")
                 return
 
             progress_match = re.match(r'([\d:]+)\s*/\s*([\d:]+)', progress)
             if progress_match and progress_match.group(1) == progress_match.group(2):
-                print(f"  Progress bar shows complete ({progress}). Continuing.")
+                log_ok(f"Progress bar shows complete ({progress}). Continuing.")
             else:
-                print(f"  Warning: 'ended' event didn't fire (progress: {progress}), "
-                      f"but we have {chunk_count} chunks. Continuing.")
+                log_warn(f"'ended' event didn't fire (progress: {progress}), "
+                         f"but we have {chunk_count} chunks. Continuing.")
 
         # == 6. Extract chunks =====================================
         print("  Extracting audio chunks...")
@@ -309,7 +335,7 @@ def get_metadata_hotaudio(url, speed=None):
         }""")
 
         if audio_data.get("tooLarge"):
-            print("  File >50MB — using in-browser download fallback...")
+            log_warn("File >50MB, using in-browser download fallback...")
             audio_bytes = _download_via_browser(page)
             if audio_bytes is None:
                 return
@@ -319,7 +345,7 @@ def get_metadata_hotaudio(url, speed=None):
         chunk_count = audio_data["chunkCount"]
         total_bytes = audio_data["totalBytes"]
         mime = audio_data["mimeType"]
-        print(f"  Captured {chunk_count} chunks, {total_bytes} bytes, MIME: {mime}")
+        log_ok(f"Captured {chunk_count} chunks, {total_bytes} bytes, MIME: {mime}")
 
         # == 7. Save to disk =======================================
         ext = "m4a" if "mp4" in mime else "webm"
@@ -337,18 +363,18 @@ def get_metadata_hotaudio(url, speed=None):
         output_path = os.path.join(media_dir, audio_filename)
 
         if os.path.exists(output_path):
-            print(f"  File already exists: {output_path}. Skipping write.")
+            log_ok(f"File already exists: {output_path}, skipping write")
         else:
             with open(output_path, "wb") as f:
                 f.write(audio_bytes)
-            print(f"  Saved: {output_path}")
+            log_ok(f"Saved: {output_path}")
 
         # == 8. Append to shared metadata ==========================
         audio_metadata.append([username, title, description, playcount, audio_filename])
-        print(f"  Done. audio_metadata now has {len(audio_metadata)} entries.")
+        log_ok(f"Done. audio_metadata now has {len(audio_metadata)} entries.")
 
     except Exception as e:
-        print(f"  FATAL: {e}")
+        log_error(f"FATAL: {e}")
         import traceback
         traceback.print_exc()
     finally:
@@ -375,7 +401,7 @@ def _download_via_browser(page):
         with open(download.path(), "rb") as f:
             return f.read()
     except Exception as e:
-        print(f"  Download fallback failed: {e}")
+        log_error(f"Download fallback failed: {e}")
         return None
 
 

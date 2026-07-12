@@ -6,6 +6,7 @@ exclude:
   - .gitattributes
   - .gitignore
   - Utilities/
+  - .vscode/
   - Gemfile
   - Gemfile.lock
   - README.md

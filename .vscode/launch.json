@@ -2,7 +2,14 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Run Utilities",
+            "name": "Python: Current File",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "Run Archiver",
             "type": "debugpy",
             "request": "launch",
             "module": "Utilities.run",

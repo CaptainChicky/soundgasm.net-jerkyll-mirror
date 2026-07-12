@@ -2,7 +2,8 @@
 import os
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-MEDIA_DIR = os.path.join(SCRIPT_DIR, "media")
+REPO_ROOT = os.path.dirname(SCRIPT_DIR) if os.path.basename(SCRIPT_DIR) == "Utilities" else SCRIPT_DIR
+MEDIA_DIR = os.path.join(REPO_ROOT, "media")
 
 # Supported audio extensions (you can expand)
 AUDIO_EXTENSIONS = {".mp3", ".m4a", ".wav", ".flac", ".opus", ".ogg", ".aac", ".webm"}
@@ -24,4 +25,4 @@ audio_files.sort(key=lambda x: x[1], reverse=True)
 # Print all files with sizes in MB
 print(f"Found {len(audio_files)} audio files:\n")
 for path, size in audio_files:
-    print(f"  {size / (1024*1024):>8.2f} MB  {os.path.relpath(path, SCRIPT_DIR)}")
+    print(f"  {size / (1024*1024):>8.2f} MB  {os.path.relpath(path, REPO_ROOT)}")

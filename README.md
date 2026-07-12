@@ -51,7 +51,7 @@ To run it, either do on the commandline
 ```bash
 python -m Utilities.run
 ```
-or run from VSC via `Run -> Run Without Debugging` while being on the `/Utilities/run.py` file. You can figure out how to run on another IDE if you use something different since I can't be assed to make support universal so womp womp ig? And also bec I don't want to have a `__main__.py`, I've included a `.vscode/launch.json` so VSC knows what to do without a main. Normally IDE configs should be on the gitignore, but this is a personal project and I've deemed it helpful enough for anyone who runs VSC to have, so here it is. If you don't use VSC, just ignore/delete it.
+or run from VSC via `Ctrl+Shift+D`, select "Run Archiver", then click run. You can figure out how to run on another IDE if you use something different since I can't be assed to make support universal so womp womp ig? And bec I don't want to have a `__main__.py`, I've included the custom `.vscode/launch.json` so VSC knows what to do without a main (there's the normal "Python: Current File" you use on `/Utilities/index.py` and `/Utilities/review.py`, and the "Run Archiver" which you use on `/Utilities/run.py`). Normally IDE configs should be on the gitignore, but this is a personal project and I've deemed it helpful enough for anyone who runs VSC to have, so here it is. If you don't use VSC, just ignore/delete it.
 
 Edit the `urls` list at the top of `/Utilities/run.py` with whatever you want to archive. It auto-detects which site each URL belongs to:
 ```python
@@ -119,7 +119,7 @@ I further recommend only converting files larger than 20-30MB to opus format, as
 
 <sup><sub>I wish soundgasm served FLAC files ngl smh</sub></sup>
 
-**ALSO**, it is quite important that you **archive only the audios that you actually <u>use</u>/want to keep**. While having a datahoarding mindset is good for preservation, sometimes it is important to question the necessity of archiving only for the purpose of archiving (and not actually using). I've structured this site as an archive that serves personal use with expectation that you actually play the audios you archive, so it would serve you well to use it for such!!!, and not just one-off audios that you will never play again. This is a personal opinion so make of it as you will but please do keep it in mind :)
+**ALSO**, it is quite important that you **archive only the audios that you actually <u>use</u>/want to keep**. While having a datahoarding mindset is good for preservation, sometimes it is important to question the necessity of archiving only for the purpose of archiving (and not actually using). I've structured this site as an archive that serves personal use with expectation that you actually play the audios you archive, so it would serve you well to use it for such!!!, and not just one-off audios that you will never play again. I have an additional script in `/Utilities/review.py` helps you do this. Ofc, this is a personal opinion so make of it as you will but please do keep it in mind :)
 
 ### <sup>☣☣</sup>Note
 

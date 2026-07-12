@@ -1,9 +1,11 @@
+"""List all downloaded audio files sorted by size (largest first)."""
 import os
 
-MEDIA_DIR = "media"
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+MEDIA_DIR = os.path.join(SCRIPT_DIR, "media")
 
 # Supported audio extensions (you can expand)
-AUDIO_EXTENSIONS = {".mp3", ".m4a", ".wav", ".flac", ".opus", ".ogg", ".aac"}
+AUDIO_EXTENSIONS = {".mp3", ".m4a", ".wav", ".flac", ".opus", ".ogg", ".aac", ".webm"}
 
 audio_files = []
 
@@ -20,6 +22,6 @@ for root, dirs, files in os.walk(MEDIA_DIR):
 audio_files.sort(key=lambda x: x[1], reverse=True)
 
 # Print all files with sizes in MB
-print("All audio files with sizes:")
+print(f"Found {len(audio_files)} audio files:\n")
 for path, size in audio_files:
-    print(f"{path} -> {size / (1024*1024):.2f} MB")
+    print(f"  {size / (1024*1024):>8.2f} MB  {os.path.relpath(path, SCRIPT_DIR)}")

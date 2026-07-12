@@ -45,23 +45,60 @@ I should uh note that my live demo I have set up has uh... interestingly been in
 
 ## Auto-archiving Audio
 
-I spent some time writing (50% GPT again lmao) `archiving.py`, which automatically updates `audio_data.yml` with metadata and saves the audio, given a soundgasm link. It may be buggy, use with care. Always use the backup file `audio_data.yml.bak` before running the script. 
+The old `archiving.py` got replaced with a whole package in `Utilities/` which does the same thing (scrape metadata + download audio + update `audio_data.yml`) but now supports soundgasm, whyp, audiochan, and hotaudio with separate handler modules. Still probably buggy tbh, always keep `audio_data.yml.bak` around before running. This makes the archiver universal (at least for the current sites I see being used on r/GWA). It's dependent on 3rd party tools (`yt-dlp`, `gallery-dl`, and `playwright`), and if they (`yt-dlp` and `gallery-dl` in particular) break, then the archiver will break too and I'll have to update the script, but man i sure hope not lmao i am too lazy 🥱🥱🥱
 
-How it works:
-We first check if the yaml file (audio_data.yml) exists, creating it if necessary. We then fetch the username, title, description, playcount, and audio file link. We download the audio file and stores it in a designated directory for the user. The metadata (username, title, description, playcount, and filename) is added to an array and subsequently saved into the yaml file. The playcount is post-processed to replace non-numeric values with random characters from our random unicode list, and then we write the yaml file back to the disk
+To run it, either do on the commandline
+```bash
+python -m Utilities.run
+```
+or run from VSC via `Run -> Run Without Debugging` while being on the `/Utilities/run.py` file. You can figure out how to run on another IDE if you use something different since I can't be assed to make support universal so womp womp ig? And also bec I don't want to have a `__main__.py`, I've included a `.vscode/launch.json` so VSC knows what to do without a main. Normally IDE configs should be on the gitignore, but this is a personal project and I've deemed it helpful enough for anyone who runs VSC to have, so here it is. If you don't use VSC, just ignore/delete it.
+
+Edit the `urls` list at the top of `/Utilities/run.py` with whatever you want to archive. It auto-detects which site each URL belongs to:
+```python
+urls = [
+    "https://soundgasm.net/u/someone/some-audio",
+    "https://whyp.it/tracks/12345/some-track",
+    "https://audiochan.com/a/some-random-audio",
+    "https://hotaudio.net/u/someone/some-audio",           # 2x speed by default
+    ("https://hotaudio.net/u/someone/other-audio", 1.0),   # tuple to override speed
+]
+```
+
+There are several requirements needed to actually run the thing (if you couldn't tell already) since I'm using 3rd party tools and python libraries ofc. By default, we need
+```bash
+pip install requests beautifulsoup4
+```
+Each handler then has its own dependencies, and if something's missing, that handler just gets skipped and everything else still works. They are as follows, 
+- **soundgasm**: just requests + bs4, nothing extra
+- **whyp**: needs `yt-dlp` on PATH
+- **audiochan**: needs `gallery-dl` on PATH
+- **hotaudio**: `pip install playwright` then `playwright install chromium`
+
+Hotaudio opens an actual browser window and plays the audio in real-time to capture it (it hooks into the browser's MediaSource API to intercept decrypted chunks as the site encrypts everything so you can't just download the file directly aka the site dev's a goofy person who tried to make a trivially bypassable JS "DRM" lolmao). A 20min track at 2x speed takes ~10min to download. *Don't minimize the Chrome window* or it throttles playback, but you can alt-tab away from it.
+
+Note that because hotaudio might have some detection for bots or whatever, I'm using a persistent Chrome profile for playwright at `~/.hotaudio_profile` (this is basically `%USERPROFILE%/.hotaudio_profile`) so the site sees a consistent browser fingerprint across runs. You can delete it to start fresh if anything gets weird, but the main thing to note is that this file is created **OUTSIDE OF THE ACTUAL REPO ITSELF**, so beware of this.
+
+Overall though, this entire thing works the same way as the old script but split into pieces:
+
+1. Check for `_data/audio_data.yml`, creates it if missing
+2. For each URL, detects the site, scrapes metadata (username, title, description, playcount), downloads the audio to `./media/{username}/`
+3. Writes everything to the YAML, but skips files that already exist for a user, disambiguates duplicate titles by repeating the last character (*cough cough ivywilde moment*)
+4. Post-processes playcounts by replacing any non-numeric ones with random unicode characters from the replacements list (﷽, 𒐫, ඞ, zalgo text, etc)
+
+Console output is color-coded so you can actually spot problems when batch-archiving 20 URLs at once. Green ✓ for stuff that worked, yellow ⚠ for missing fields (no playcount, no description, etc), red ✗ for actual errors. This console logging mechanism is AI generated if you couldn't tell from the untypable unicode already 🥀
 
 For reference, here are unicode chars you can use for the replacements array: https://www.reddit.com/r/Unicode/comments/5qa7e7/widestlongest_unicode_characters_list/
 
 ## Building
 
 Locally, (assuming you have Jerkyll and bundler installed, if not, do that) you can just run 
-```
+```bash
 bundle install
 ```
 when setting it up for the first time.
 
 Then, you can build and serve the website locally via
-```cmd
+```bash
 bundle exec jekyll build
 bundle exec jekyll serve
 ```
@@ -74,13 +111,15 @@ Have fun ig :3
 
 ## Space Considerations
 
-As you know, media files can become large. Eventually if you are actually serving this online like I am, it may be worthwhile to convert the audio files into a more efficient encoding like opus from what they are now (mainly 128kbps aac and 192kbps mp3). I've testd aac with opus and 128kbps → 128kbps still decreases file size lol. You can check the largest media files with `index.py` which will output a list of audio ranked by file size in the `/media/` folder.
+As you know, media files can become large. Eventually if you are actually serving this online like I am, it may be worthwhile to convert the audio files into a more efficient encoding like opus from what they are now (mainly 128kbps aac and 192kbps mp3). I've testd aac with opus and 128kbps → 128kbps still decreases file size lol. You can check the largest media files with `/Utilities/index.py` which will output a list of audio ranked by file size in the `/media/` folder.
 
-Since lossy → lossy conversion is... lossy<sup><small>[citation needed]</small></sup>, do be careful with the bitrates. I would recommend for ~128kbps aac files to be converted into 112-128kbps opus files, and ~192kbps mp3s to be converted into 128kbps opus files. This minimizes generation loss, and likely maintains a wide transparency margin. If the audio has lower bitrate than my aforementioned specifications, it would not be worthwhile to convert them into opus due to high generation loss.
+Since lossy → lossy conversion is... lossy<sup><small>[citation needed]</small></sup>, do be careful with the bitrates. I would recommend for ~128kbps aac files to be converted into 112-128kbps opus files, and ~192kbps mp3s to be converted into 128kbps opus files. This minimizes generation loss, and likely maintains a wide transparency margin. If the audio has lower bitrate than my aforementioned specifications, it would not be worthwhile to convert them into opus due to high generation loss. You should definetely compare the two audios side by side to see it's transparent or not. If you dont hear any difference, then might as well convert right? :)
 
 I further recommend only converting files larger than 20-30MB to opus format, as for smaller files it is not worth it tbh. I say this but tbh I'm not gonna do this for now as I'll like to maintain original audio quality as much as possible and my site compilation runner vm still has enough space lmao so whatever
 
 <sup><sub>I wish soundgasm served FLAC files ngl smh</sub></sup>
+
+**ALSO**, it is quite important that you **archive only the audios that you actually <u>use</u>/want to keep**. While having a datahoarding mindset is good for preservation, sometimes it is important to question the necessity of archiving only for the purpose of archiving (and not actually using). I've structured this site as an archive that serves personal use with expectation that you actually play the audios you archive, so it would serve you well to use it for such!!!, and not just one-off audios that you will never play again. This is a personal opinion so make of it as you will but please do keep it in mind :)
 
 ### <sup>☣☣</sup>Note
 

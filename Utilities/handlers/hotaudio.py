@@ -390,7 +390,4 @@ def _download_via_browser(page):
         return None
 
 
-# == Auto-register =====================================================
-# Only registers if Playwright is actually installed; otherwise the
-# import is silently skipped by handlers/__init__.py.
 register("hotaudio", "hotaudio", get_metadata_hotaudio)

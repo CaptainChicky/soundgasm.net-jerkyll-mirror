@@ -15,7 +15,7 @@ Notes:
     - Plays at 2x by default.  Set HOTAUDIO_SPEED=1 env var if you want
       bit-perfect captures (2x is safe, >2x causes cipher drift).
     - hotaudio_inject.js must sit next to this file (same directory).
-    - Do not attempt to set this above 2x speed. You will be IP Banned.
+    - Do not attempt to set this above 2x speed. You will be IP banned lol.
 """
 import os
 import re

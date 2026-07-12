@@ -281,7 +281,7 @@ def get_metadata_hotaudio(url, speed=None):
                     if m:
                         total_sec += int(m.group(1)) * mult
                 if total_sec > 0:
-                    real_sec = (total_sec / closest_speed) + 60 # 1 min buffer
+                    real_sec = (total_sec / closest_speed) + 45 # 45 sec buffer
                     wait_timeout_ms = int(real_sec * 1000)
                     print(f"  Computed timeout: {real_sec:.0f}s "
                           f"(track {total_sec}s at {closest_speed}x)")
@@ -312,40 +312,25 @@ def get_metadata_hotaudio(url, speed=None):
                 log_warn(f"'ended' event didn't fire (progress: {progress}), "
                          f"but we have {chunk_count} chunks. Continuing.")
 
-        # == 6. Extract chunks =====================================
-        print("  Extracting audio chunks...")
-        audio_data = page.evaluate("""() => {
+        # == 6. Extract audio via Blob download =====================
+        print("  Extracting audio...")
+        audio_info = page.evaluate("""() => {
             const st = window.__INTERCEPTOR;
-            const result = {
+            return {
                 mimeType: st.mimeType,
                 chunkCount: st.chunks.length,
                 totalBytes: st.chunks.reduce((s, c) => s + c.byteLength, 0),
-                data: [],
             };
-            if (result.totalBytes > 50 * 1024 * 1024) {
-                result.tooLarge = true;
-                return result;
-            }
-            for (const chunk of st.chunks) {
-                for (let i = 0; i < chunk.byteLength; i++) {
-                    result.data.push(chunk[i]);
-                }
-            }
-            return result;
         }""")
 
-        if audio_data.get("tooLarge"):
-            log_warn("File >50MB, using in-browser download fallback...")
-            audio_bytes = _download_via_browser(page)
-            if audio_bytes is None:
-                return
-        else:
-            audio_bytes = bytes(audio_data["data"])
-
-        chunk_count = audio_data["chunkCount"]
-        total_bytes = audio_data["totalBytes"]
-        mime = audio_data["mimeType"]
+        chunk_count = audio_info["chunkCount"]
+        total_bytes = audio_info["totalBytes"]
+        mime = audio_info["mimeType"]
         log_ok(f"Captured {chunk_count} chunks, {total_bytes} bytes, MIME: {mime}")
+
+        audio_bytes = _download_via_browser(page)
+        if audio_bytes is None:
+            return
 
         # == 7. Save to disk =======================================
         ext = "m4a" if "mp4" in mime else "webm"
@@ -382,7 +367,7 @@ def get_metadata_hotaudio(url, speed=None):
 
 
 def _download_via_browser(page):
-    """Fallback for >50MB files: trigger an in-browser Blob download."""
+    """Create a Blob from captured chunks and trigger a browser-native download."""
     try:
         with page.expect_download(timeout=30_000) as dl_info:
             page.evaluate("""() => {

@@ -52,7 +52,7 @@ urls = [
     # hotaudio with explicit speed override:
     # ("https://hotaudio.net/u/SweetnEvil86/Your-Former-Teacher-Rewards-You-For-Being-a-Good-Boy", 1.0),
 
-    "https://hotaudio.net/u/Financial-Dig4285/Blowjob-gift-card-from-your-friends-girlfriend"
+    "https://soundgasm.net/u/LeyLeyVA/Milf-at-the-Waterpark-Hits-On-You"
 ]
 
 

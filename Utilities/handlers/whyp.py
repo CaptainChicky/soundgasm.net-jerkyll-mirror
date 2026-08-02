@@ -20,14 +20,19 @@ from ..yaml_store import is_already_archived
 # == Backend: yt-dlp ===================================================
 def _ytdlp_metadata(url):
     """Try yt-dlp JSON dump.  Returns parsed info dict or None."""
-    if shutil.which("yt-dlp") is None:
-        return None
     print("  Trying yt-dlp...")
-    result = subprocess.run(["yt-dlp", "-j", url],
-                            capture_output=True, text=True)
+    try:
+        result = subprocess.run(
+            ["yt-dlp", "-j", url], capture_output=True, text=True, timeout=60,
+        )
+    except FileNotFoundError:
+        log_warn("yt-dlp not found on PATH")
+        return None
+    except subprocess.TimeoutExpired:
+        log_warn("yt-dlp timed out after 60s")
+        return None
     if result.returncode != 0:
-        stderr_last = result.stderr.strip().splitlines(
-        )[-1] if result.stderr.strip() else "unknown error"
+        stderr_last = result.stderr.strip().splitlines()[-1] if result.stderr.strip() else "unknown error"
         log_warn(f"yt-dlp failed: {stderr_last}")
         return None
     try:
@@ -44,8 +49,7 @@ def _ytdlp_parse(info):
     description = info.get("description") or "No description found"
 
     view_count = info.get("view_count")
-    playcount = str(
-        view_count) if view_count is not None else "No playcount found"
+    playcount = str(view_count) if view_count is not None else "No playcount found"
 
     cdn_url = info.get("url", "")
     cdn_match = re.search(r'/([a-f0-9-]+\.\w+)\?', cdn_url)
@@ -61,11 +65,15 @@ def _ytdlp_parse(info):
 
 def _ytdlp_download(url, output_path):
     """Download via yt-dlp.  Returns True on success."""
-    dl = subprocess.run(
-        ["yt-dlp", "-o", output_path, url], capture_output=True, text=True,
-    )
+    try:
+        dl = subprocess.run(
+            ["yt-dlp", "-o", output_path, url], capture_output=True, text=True, timeout=120,
+        )
+    except (FileNotFoundError, subprocess.TimeoutExpired):
+        log_warn("yt-dlp download failed, trying gallery-dl...")
+        return False
     if dl.returncode != 0:
-        log_warn(f"yt-dlp download failed, trying gallery-dl...")
+        log_warn("yt-dlp download failed, trying gallery-dl...")
         return False
     return True
 
@@ -73,15 +81,19 @@ def _ytdlp_download(url, output_path):
 # == Backend: gallery-dl ===============================================
 def _gallerydl_metadata(url):
     """Try gallery-dl JSON dump.  Returns parsed info dict or None."""
-    if shutil.which("gallery-dl") is None:
-        return None
     print("  Trying gallery-dl...")
-    result = subprocess.run(
-        ["gallery-dl", "-j", url], capture_output=True, text=True,
-    )
+    try:
+        result = subprocess.run(
+            ["gallery-dl", "-j", url], capture_output=True, text=True, timeout=60,
+        )
+    except FileNotFoundError:
+        log_warn("gallery-dl not found on PATH")
+        return None
+    except subprocess.TimeoutExpired:
+        log_warn("gallery-dl timed out after 60s")
+        return None
     if result.returncode != 0:
-        stderr_last = result.stderr.strip().splitlines(
-        )[-1] if result.stderr.strip() else "unknown error"
+        stderr_last = result.stderr.strip().splitlines()[-1] if result.stderr.strip() else "unknown error"
         log_warn(f"gallery-dl failed: {stderr_last}")
         return None
     try:
@@ -125,11 +137,9 @@ def _gallerydl_parse(info):
     listen_count = (info.get("valid_listens")
                     or info.get("view_count")
                     or info.get("listens"))
-    playcount = str(
-        listen_count) if listen_count is not None else "No playcount found"
+    playcount = str(listen_count) if listen_count is not None else "No playcount found"
 
-    slug = info.get("filename") or info.get(
-        "slug") or str(info.get("id", "unknown"))
+    slug = info.get("filename") or info.get("slug") or str(info.get("id", "unknown"))
     ext = info.get("extension") or "mp3"
     audio_filename = f"{slug}.{ext}"
 
@@ -139,16 +149,23 @@ def _gallerydl_parse(info):
 def _gallerydl_download(url, username, audio_filename, output_path):
     """Download via gallery-dl.  Returns True on success."""
     slug = audio_filename.rsplit(".", 1)[0]
-    dl = subprocess.run(
-        [
-            "gallery-dl",
-            "-d", ".",
-            "-o", f'directory=["media", "{username}"]',
-            "-o", f"filename={slug}.{{extension}}",
-            url,
-        ],
-        capture_output=True, text=True,
-    )
+    try:
+        dl = subprocess.run(
+            [
+                "gallery-dl",
+                "-d", ".",
+                "-o", f'directory=["media", "{username}"]',
+                "-o", f"filename={slug}.{{extension}}",
+                url,
+            ],
+            capture_output=True, text=True, timeout=120,
+        )
+    except FileNotFoundError:
+        log_error("gallery-dl not found on PATH")
+        return False
+    except subprocess.TimeoutExpired:
+        log_error("gallery-dl download timed out after 120s")
+        return False
     if dl.returncode != 0:
         log_error(f"gallery-dl download failed:\n{dl.stderr}")
         return False
@@ -176,17 +193,14 @@ def get_metadata_whyp(url):
     info = _ytdlp_metadata(url)
     if info is not None:
         backend = "ytdlp"
-        username, title, description, playcount, audio_filename = _ytdlp_parse(
-            info)
+        username, title, description, playcount, audio_filename = _ytdlp_parse(info)
     else:
         info = _gallerydl_metadata(url)
         if info is not None:
             backend = "gallerydl"
-            username, title, description, playcount, audio_filename = _gallerydl_parse(
-                info)
+            username, title, description, playcount, audio_filename = _gallerydl_parse(info)
         else:
-            log_error(
-                "Both yt-dlp and gallery-dl failed. Cannot process this URL.")
+            log_error("Both yt-dlp and gallery-dl failed. Cannot process this URL.")
             return
 
     username = resolve_author(username)
@@ -197,12 +211,9 @@ def get_metadata_whyp(url):
     else:
         log_ok(f"Username: {username}")
 
-    log_ok(f"Title: {title}") if title != "No title found" else log_warn(
-        f"Title not found for {url}")
-    log_ok(f"Description: {description[:80]}...") if description != "No description found" else log_warn(
-        f"Description not found for {url}")
-    log_ok(f"Playcount: {playcount}") if playcount != "No playcount found" else log_warn(
-        f"Playcount not found for {url}")
+    log_ok(f"Title: {title}") if title != "No title found" else log_warn(f"Title not found for {url}")
+    log_ok(f"Description: {description[:80]}...") if description != "No description found" else log_warn(f"Description not found for {url}")
+    log_ok(f"Playcount: {playcount}") if playcount != "No playcount found" else log_warn(f"Playcount not found for {url}")
     log_ok(f"Audio filename: {audio_filename}")
     log_ok(f"Backend: {backend}")
 
@@ -228,8 +239,7 @@ def get_metadata_whyp(url):
         return
 
     log_ok(f"Downloaded: {output_path}")
-    audio_metadata.append(
-        [username, title, description, playcount, audio_filename])
+    audio_metadata.append([username, title, description, playcount, audio_filename])
 
 
 register("whyp", "whyp.it", get_metadata_whyp)

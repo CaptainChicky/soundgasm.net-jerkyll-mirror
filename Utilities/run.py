@@ -55,16 +55,13 @@ urls = [
     # hotaudio with explicit speed override:
     # ("https://hotaudio.net/u/SweetnEvil86/Your-Former-Teacher-Rewards-You-For-Being-a-Good-Boy", 1.0),
 
-    "https://soundgasm.net/u/LeyLeyVA/Milf-at-the-Waterpark-Hits-On-You",
-    "https://soundgasm.net/u/RoteDisaster/BODY",
-    "https://soundgasm.net/u/lolabites/F4M-I-Drugged-and-Fucked-You-Every-Night-During-No-Nut-November",
-    "https://soundgasm.net/u/listen_to_my_voice/F4M-Dude-Your-Dick-Is-Literally-In-My-Mouth-OF-COURSE-I-LIKE-YOU-Your-Goth-Bestie-Has-Had-It-With-Your-Obliviousness",
-    "https://soundgasm.net/u/lilostitchdonky/F4M-Just-the-tip-With-Your-High-Little-Sis-Improv-INCEST-RAPE-Slippery-slope-420-Reluctant-Just-the-Tip-Daddy-Dacryphilia-Cuddling",
-    "https://soundgasm.net/u/lilostitchdonky/F4M-Drunk-Big-Sister-Mistakes-Her-Little-Brother-For-Her-Boyfriend-After-Girls-Night-Improv-Incest-RAPE-Drunk-Fdom-Somnophilia",
-    "https://soundgasm.net/u/skitty/Hot-Teacher-Breeds-Her-Student-M",
-    "https://soundgasm.net/u/skitty/Big-sister-takes-it-all-out-on-her-little-brother-1",
-    "https://soundgasm.net/u/skitty/Big-sister-takes-it-all-out-on-her-little-brother-2",
-    "https://soundgasm.net/u/skitty/Big-sister-takes-it-all-out-on-her-little-brother-3"
+    "https://whyp.it/tracks/277360/f4m-your-succubus-bestie-needs-to-recharge-and-you-turn-her-into-a-cock-crazed-semen-demon?token=FXmwM",
+    "https://whyp.it/tracks/262766/f4m-big-sis-pampers-you-with-kisses?token=acxm1",
+    "https://whyp.it/tracks/353133/hiccup",
+    "https://whyp.it/tracks/353136/goodboy",
+    "https://whyp.it/tracks/355115/growth-ai-gfe-cursed",
+    "https://whyp.it/tracks/355119/heartbreak-itll-get-better-hugs",
+    "https://whyp.it/tracks/355123/f4a-your-cool-girl-friend-takes-you-skinny-dipping-friends-nature-slice-of-life"
 ]
 
 

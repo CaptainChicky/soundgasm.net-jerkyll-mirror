@@ -67,6 +67,61 @@ def _modify_duplicate_title(title):
     return title
 
 
+# == Pre-download duplicate check ======================================
+def is_already_archived(username, audio_filename):
+    """
+    Check BEFORE downloading whether this audio is already archived.
+
+    Looks in three places:
+      1. In-memory queue  (already scraped this run but not yet written)
+      2. YAML on disk     (written by a previous run)
+      3. Media folder     (file on disk even if YAML entry is missing)
+
+    Handlers should call this after resolving the filename but before
+    downloading the file.  Returns True when the download can be skipped.
+    """
+    # 0. Force redownload when applicable
+    from .config import FORCE_REDOWNLOAD
+    if FORCE_REDOWNLOAD:
+        return False
+    
+    # 1. Already queued this run
+    for entry in audio_metadata:
+        if entry[0] == username and entry[4] == audio_filename:
+            return True
+
+    # 2. Recorded in YAML from a previous run
+    if os.path.exists(YAML_FILE):
+        with open(YAML_FILE, "r", encoding="utf-8") as f:
+            yaml_content = f.read()
+        if audio_filename in _get_existing_user_audios(yaml_content, username):
+            return True
+
+    # 3. File sitting on disk (belt-and-suspenders)
+    media_path = os.path.join("media", username, audio_filename)
+    if os.path.exists(media_path):
+        return True
+
+    return False
+
+
+def _remove_audio_entry(yaml_content, audio_filename):
+    """Remove a single entry block (title through audio line) from YAML content."""
+    marker = f"audio: '{audio_filename}'"
+    idx = yaml_content.find(marker)
+    if idx == -1:
+        return yaml_content
+    start = yaml_content.rfind("    - title:", 0, idx)
+    if start == -1:
+        return yaml_content
+    end = yaml_content.find("\n", idx)
+    if end == -1:
+        end = len(yaml_content)
+    else:
+        end += 1
+    return yaml_content[:start] + yaml_content[end:]
+
+
 # == Main save =========================================================
 def save_metadata_to_yaml():
     """Write every entry in audio_metadata into the YAML file."""
@@ -76,8 +131,11 @@ def save_metadata_to_yaml():
     for username, title, description, playcount, audio_filename in audio_metadata:
         # Skip true duplicates (same file already on disk for this user)
         if audio_filename in _get_existing_user_audios(yaml_content, username):
-            log_warn(f"Audio '{audio_filename}' already exists for {username}. Skipping...")
-            continue
+            from .config import FORCE_REDOWNLOAD
+            if not FORCE_REDOWNLOAD:
+                log_warn(f"Audio '{audio_filename}' already exists for {username}. Skipping...")
+                continue
+            yaml_content = _remove_audio_entry(yaml_content, audio_filename)
 
         # Disambiguate duplicate titles within the same user
         existing_titles = _get_existing_user_titles(yaml_content, username)

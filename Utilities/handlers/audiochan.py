@@ -11,6 +11,7 @@ import subprocess
 
 from ..config import resolve_author, log_ok, log_warn, log_error
 from ..registry import audio_metadata, register
+from ..yaml_store import is_already_archived
 
 
 def get_metadata_audiochan(url):
@@ -94,42 +95,43 @@ def get_metadata_audiochan(url):
     log_ok(f"Audio filename: {audio_filename}")
 
     # == Download ==================================================
+    if is_already_archived(username, audio_filename):
+        log_ok(f"Already archived for {username}. Skipping download.")
+        return
+
     media_dir = f"./media/{username}"
     os.makedirs(media_dir, exist_ok=True)
     output_path = os.path.join(media_dir, audio_filename)
 
-    if os.path.exists(output_path):
-        log_ok(f"File already exists: {output_path} — skipping download")
-    else:
-        print(f"  Downloading audio to {media_dir}...")
-        dl = subprocess.run(
-            [
-                "gallery-dl",
-                "-d", ".",
-                "-o", f'directory=["media", "{username}"]',
-                "-o", f"filename={slug}.{{extension}}",
-                url,
-            ],
-            capture_output=True, text=True,
-        )
-        if dl.returncode != 0:
-            log_error(f"gallery-dl download failed:\n{dl.stderr}")
+    print(f"  Downloading audio to {media_dir}...")
+    dl = subprocess.run(
+        [
+            "gallery-dl",
+            "-d", ".",
+            "-o", f'directory=["media", "{username}"]',
+            "-o", f"filename={slug}.{{extension}}",
+            url,
+        ],
+        capture_output=True, text=True,
+    )
+    if dl.returncode != 0:
+        log_error(f"gallery-dl download failed:\n{dl.stderr}")
+        return
+
+    # Hunt for the file if gallery-dl ignored our output overrides
+    if not os.path.exists(output_path):
+        default_dir = os.path.join(".", "gallery-dl", "audiochan", username)
+        candidates = glob.glob(os.path.join(default_dir, "*"))
+        if candidates:
+            actual = max(candidates, key=os.path.getmtime)
+            shutil.move(actual, output_path)
+            log_ok(f"Moved {actual} -> {output_path}")
+        else:
+            log_error("Could not locate downloaded file.")
+            print(f"  gallery-dl stdout:\n{dl.stdout}")
             return
 
-        # Hunt for the file if gallery-dl ignored our output overrides
-        if not os.path.exists(output_path):
-            default_dir = os.path.join(".", "gallery-dl", "audiochan", username)
-            candidates = glob.glob(os.path.join(default_dir, "*"))
-            if candidates:
-                actual = max(candidates, key=os.path.getmtime)
-                shutil.move(actual, output_path)
-                log_ok(f"Moved {actual} -> {output_path}")
-            else:
-                log_error("Could not locate downloaded file.")
-                print(f"  gallery-dl stdout:\n{dl.stdout}")
-                return
-
-        log_ok(f"Downloaded: {output_path}")
+    log_ok(f"Downloaded: {output_path}")
 
     audio_metadata.append([username, title, description, playcount, audio_filename])
 

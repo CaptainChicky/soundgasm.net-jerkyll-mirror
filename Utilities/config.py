@@ -18,6 +18,7 @@ AUTHOR_SYNONYMS = {
     "skittykat": "skitty",
 }
 
+FORCE_REDOWNLOAD = False
 
 def resolve_author(username):
     """Map alternate usernames to their canonical form."""

@@ -11,6 +11,7 @@ import subprocess
 
 from ..config import resolve_author, log_ok, log_warn, log_error
 from ..registry import audio_metadata, register
+from ..yaml_store import is_already_archived
 
 
 def get_metadata_whyp(url):
@@ -67,21 +68,22 @@ def get_metadata_whyp(url):
         log_warn(f"Couldn't extract CDN hash, falling back to {audio_filename}")
 
     # == Download ==================================================
+    if is_already_archived(username, audio_filename):
+        log_ok(f"Already archived for {username}. Skipping download.")
+        return
+
     media_dir = f"./media/{username}"
     os.makedirs(media_dir, exist_ok=True)
     output_path = os.path.join(media_dir, audio_filename)
 
-    if os.path.exists(output_path):
-        log_ok(f"File already exists: {output_path} — skipping download")
-    else:
-        print(f"  Downloading audio to {media_dir}...")
-        dl = subprocess.run(
-            ["yt-dlp", "-o", output_path, url], capture_output=True, text=True,
-        )
-        if dl.returncode != 0:
-            log_error(f"yt-dlp download failed:\n{dl.stderr}")
-            return
-        log_ok(f"Downloaded: {output_path}")
+    print(f"  Downloading audio to {media_dir}...")
+    dl = subprocess.run(
+        ["yt-dlp", "-o", output_path, url], capture_output=True, text=True,
+    )
+    if dl.returncode != 0:
+        log_error(f"yt-dlp download failed:\n{dl.stderr}")
+        return
+    log_ok(f"Downloaded: {output_path}")
 
     audio_metadata.append([username, title, description, playcount, audio_filename])
 

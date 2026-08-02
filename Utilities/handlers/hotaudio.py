@@ -23,6 +23,7 @@ from pathlib import Path
 
 from ..config import resolve_author, log_ok, log_warn, log_error
 from ..registry import audio_metadata, register
+from ..yaml_store import is_already_archived
 
 # == Constants =========================================================
 INJECT_JS = (Path(__file__).parent / "hotaudio_inject.js").read_text()
@@ -348,12 +349,13 @@ def get_metadata_hotaudio(url, speed=None):
         os.makedirs(media_dir, exist_ok=True)
         output_path = os.path.join(media_dir, audio_filename)
 
-        if os.path.exists(output_path):
-            log_ok(f"File already exists: {output_path}, skipping write")
-        else:
-            with open(output_path, "wb") as f:
-                f.write(audio_bytes)
-            log_ok(f"Saved: {output_path}")
+        if is_already_archived(username, audio_filename):
+            log_ok(f"Already archived for {username}. Skipping write.")
+            return
+
+        with open(output_path, "wb") as f:
+            f.write(audio_bytes)
+        log_ok(f"Saved: {output_path}")
 
         # == 8. Append to shared metadata ==========================
         audio_metadata.append([username, title, description, playcount, audio_filename])

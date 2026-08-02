@@ -10,6 +10,7 @@ from bs4 import BeautifulSoup
 
 from ..config import resolve_author, log_ok, log_warn, log_error
 from ..registry import audio_metadata, register
+from ..yaml_store import is_already_archived
 
 
 def get_metadata_soundgasm(url):
@@ -71,6 +72,10 @@ def get_metadata_soundgasm(url):
 
     audio_filename = audio_match.group(1)
     log_ok(f"Audio filename: {audio_filename}")
+
+    if is_already_archived(username, audio_filename):
+        log_ok(f"Already archived for {username}. Skipping download.")
+        return
 
     media_dir = f"./media/{username}"
     os.makedirs(media_dir, exist_ok=True)

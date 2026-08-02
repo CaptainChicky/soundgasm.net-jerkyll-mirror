@@ -215,7 +215,6 @@ def get_metadata_whyp(url):
     log_ok(f"Description: {description[:80]}...") if description != "No description found" else log_warn(f"Description not found for {url}")
     log_ok(f"Playcount: {playcount}") if playcount != "No playcount found" else log_warn(f"Playcount not found for {url}")
     log_ok(f"Audio filename: {audio_filename}")
-    log_ok(f"Backend: {backend}")
 
     # -- Archive check -------------------------------------------------
     if is_already_archived(username, audio_filename):

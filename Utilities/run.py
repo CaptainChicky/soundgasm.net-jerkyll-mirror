@@ -55,13 +55,11 @@ urls = [
     # hotaudio with explicit speed override:
     # ("https://hotaudio.net/u/SweetnEvil86/Your-Former-Teacher-Rewards-You-For-Being-a-Good-Boy", 1.0),
 
-    "https://whyp.it/tracks/277360/f4m-your-succubus-bestie-needs-to-recharge-and-you-turn-her-into-a-cock-crazed-semen-demon?token=FXmwM",
-    "https://whyp.it/tracks/262766/f4m-big-sis-pampers-you-with-kisses?token=acxm1",
-    "https://whyp.it/tracks/353133/hiccup",
-    "https://whyp.it/tracks/353136/goodboy",
-    "https://whyp.it/tracks/355115/growth-ai-gfe-cursed",
-    "https://whyp.it/tracks/355119/heartbreak-itll-get-better-hugs",
-    "https://whyp.it/tracks/355123/f4a-your-cool-girl-friend-takes-you-skinny-dipping-friends-nature-slice-of-life"
+    "https://whyp.it/tracks/f4m-bad-coach-disciplines-naughty-girl-short-stude-ZPfpz79viQq2",
+    "https://whyp.it/tracks/f4m-bad-coach-disciplines-naughty-girl-short-colle-ZFeYBD7UHeQO",
+    "https://whyp.it/tracks/nyotaimori-f4a-short-no-sex-delivery-yU2C9ziSq8N5",
+    "https://whyp.it/tracks/f4f-mesmerized-by-her-golden-eyes-hypnosis-lamia-s-u9fYAkfGrdY5",
+    "https://whyp.it/tracks/f4m-mesmerized-by-her-golden-eyes-hypnosis-lamia-s-jurXnTH4ZwJv"
 ]
 
 
